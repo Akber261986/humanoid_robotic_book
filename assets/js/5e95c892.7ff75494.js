@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkhumanoid_robotic_book=globalThis.webpackChunkhumanoid_robotic_book||[]).push([[647],{7121:(o,e,r)=>{r.r(e),r.d(e,{default:()=>n});r(6540);var a=r(4164),s=r(7559),u=r(1003),c=r(2831),i=r(781),h=r(4848);function n(o){return(0,h.jsx)(u.e3,{className:(0,a.A)(s.G.wrapper.docsPages),children:(0,h.jsx)(i.A,{children:(0,c.v)(o.route.routes)})})}}}]);
