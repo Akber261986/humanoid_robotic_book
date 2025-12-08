@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-module4/deployment_arch" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.1.0">
+<title data-rh="true">Deployment Architectures | Physical AI &amp; Humanoid Robotics</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://Akber261986.github.io/humanoid_robotic_book/img/docusaurus-social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://Akber261986.github.io/humanoid_robotic_book/img/docusaurus-social-card.jpg"><meta data-rh="true" property="og:url" content="https://Akber261986.github.io/humanoid_robotic_book/docs/module4/deployment_arch"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Deployment Architectures | Physical AI &amp; Humanoid Robotics"><meta data-rh="true" name="description" content="Overview"><meta data-rh="true" property="og:description" content="Overview"><link data-rh="true" rel="icon" href="/humanoid_robotic_book/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://Akber261986.github.io/humanoid_robotic_book/docs/module4/deployment_arch"><link data-rh="true" rel="alternate" href="https://Akber261986.github.io/humanoid_robotic_book/docs/module4/deployment_arch" hreflang="en"><link data-rh="true" rel="alternate" href="https://Akber261986.github.io/humanoid_robotic_book/docs/module4/deployment_arch" hreflang="x-default"><link rel="stylesheet" href="/humanoid_robotic_book/assets/css/styles.748f7d5e.css">
+<script src="/humanoid_robotic_book/assets/js/runtime~main.8145c758.js" defer="defer"></script>
+<script src="/humanoid_robotic_book/assets/js/main.bbcef23c.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return localStorage.getItem("theme")}catch(t){}}();t(null!==e?e:"light")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/humanoid_robotic_book/"><div class="navbar__logo"><img src="/humanoid_robotic_book/img/Book_logo.png" alt="Physical AI &amp; Humanoid Robotics Book Logo" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/humanoid_robotic_book/img/Book_logo.png" alt="Physical AI &amp; Humanoid Robotics Book Logo" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">Physical AI &amp; Humanoid Robotics</b></a><a class="navbar__item navbar__link" href="/humanoid_robotic_book/docs/module1/intro_physical_ai">Read Book</a></div><div class="navbar__items navbar__items--right"><a href="https://github.com/Akber261986/humanoid_robotic_book" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="Switch between dark and light mode (currently light mode)" aria-label="Switch between dark and light mode (currently light mode)" aria-live="polite"><svg viewBox="0 0 24 24" width="24" height="24" class="lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" class="darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><main class="docMainContainer_TBSr docMainContainerEnhanced_lQrH"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><h1>Deployment Architectures</h1>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="overview">Overview<a href="#overview" class="hash-link" aria-label="Direct link to Overview" title="Direct link to Overview">​</a></h2>
+<p>Deployment architectures for robotic systems define how software components are organized, distributed, and executed when transitioning from development to production environments. This chapter explores various deployment architectures for humanoid robots, considering factors such as computational requirements, safety, reliability, and maintainability.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="architectural-patterns">Architectural Patterns<a href="#architectural-patterns" class="hash-link" aria-label="Direct link to Architectural Patterns" title="Direct link to Architectural Patterns">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="1-centralized-architecture">1. Centralized Architecture<a href="#1-centralized-architecture" class="hash-link" aria-label="Direct link to 1. Centralized Architecture" title="Direct link to 1. Centralized Architecture">​</a></h3>
+<p>In a centralized architecture, all computation occurs on the robot itself or on a single computing platform connected to the robot.</p>
+<p><strong>Characteristics:</strong></p>
+<ul>
+<li>All processing happens on a single powerful computer</li>
+<li>Minimal network dependencies during operation</li>
+<li>High computational requirements for the central unit</li>
+<li>Single point of failure risk</li>
+</ul>
+<p><strong>Components:</strong></p>
+<ul>
+<li><strong>Central Computer</strong>: High-performance computing platform (e.g., NVIDIA Jetson, workstation PC)</li>
+<li><strong>Real-time Controller</strong>: Low-latency control systems for safety-critical functions</li>
+<li><strong>AI Processing Unit</strong>: GPUs or specialized AI accelerators for VLA and other AI models</li>
+<li><strong>Communication Hub</strong>: Manages all sensor and actuator interfaces</li>
+</ul>
+<p><strong>Use Cases:</strong></p>
+<ul>
+<li>Research robots with high computational needs</li>
+<li>Robots operating in areas with limited connectivity</li>
+<li>Applications requiring minimal network latency</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="2-distributed-architecture">2. Distributed Architecture<a href="#2-distributed-architecture" class="hash-link" aria-label="Direct link to 2. Distributed Architecture" title="Direct link to 2. Distributed Architecture">​</a></h3>
+<p>A distributed architecture spreads computation across multiple processing units, potentially including cloud resources.</p>
+<p><strong>Characteristics:</strong></p>
+<ul>
+<li>Computation distributed across multiple nodes</li>
+<li>Network communication between components</li>
+<li>Better fault tolerance</li>
+<li>More complex system management</li>
+</ul>
+<p><strong>Components:</strong></p>
+<ul>
+<li><strong>Edge Computing</strong>: Local processing for time-critical tasks</li>
+<li><strong>Cloud Computing</strong>: Heavy computation offloaded to remote servers</li>
+<li><strong>Communication Layer</strong>: Robust networking for component coordination</li>
+<li><strong>Load Balancing</strong>: Distribution of computational tasks</li>
+</ul>
+<p><strong>Use Cases:</strong></p>
+<ul>
+<li>Robots with limited local computing resources</li>
+<li>Applications with variable computational demands</li>
+<li>Systems requiring access to large datasets or models</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="3-hybrid-architecture">3. Hybrid Architecture<a href="#3-hybrid-architecture" class="hash-link" aria-label="Direct link to 3. Hybrid Architecture" title="Direct link to 3. Hybrid Architecture">​</a></h3>
+<p>Combines centralized and distributed approaches, keeping critical functions local while offloading non-critical computation.</p>
+<p><strong>Characteristics:</strong></p>
+<ul>
+<li>Safety-critical functions on-board</li>
+<li>Complex AI processing potentially in cloud</li>
+<li>Adaptive resource allocation</li>
+<li>Optimized for specific use cases</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="edge-computing-for-robotics">Edge Computing for Robotics<a href="#edge-computing-for-robotics" class="hash-link" aria-label="Direct link to Edge Computing for Robotics" title="Direct link to Edge Computing for Robotics">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="local-processing-requirements">Local Processing Requirements<a href="#local-processing-requirements" class="hash-link" aria-label="Direct link to Local Processing Requirements" title="Direct link to Local Processing Requirements">​</a></h3>
+<p>For humanoid robots, certain functions must be processed locally:</p>
+<ul>
+<li><strong>Safety Systems</strong>: Emergency stops and collision avoidance</li>
+<li><strong>Low-level Control</strong>: Motor control and basic sensor processing</li>
+<li><strong>Localization</strong>: Real-time position tracking</li>
+<li><strong>Obstacle Avoidance</strong>: Immediate collision prevention</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="edge-hardware-options">Edge Hardware Options<a href="#edge-hardware-options" class="hash-link" aria-label="Direct link to Edge Hardware Options" title="Direct link to Edge Hardware Options">​</a></h3>
+<ol>
+<li>
+<p><strong>NVIDIA Jetson Series</strong>: ARM-based platforms with GPU acceleration</p>
+<ul>
+<li>Jetson AGX Orin: High-performance for complex AI tasks</li>
+<li>Jetson Orin NX: Balanced performance and power consumption</li>
+<li>Jetson Nano: Entry-level AI processing</li>
+</ul>
+</li>
+<li>
+<p><strong>Intel-Based Systems</strong>: x86 platforms with GPU acceleration</p>
+<ul>
+<li>Intel NUC with discrete GPU</li>
+<li>Custom mini-PCs with embedded GPUs</li>
+</ul>
+</li>
+<li>
+<p><strong>Specialized Platforms</strong>: Purpose-built for robotics</p>
+<ul>
+<li>Robot computers with integrated I/O</li>
+<li>Ruggedized systems for harsh environments</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="edge-software-stack">Edge Software Stack<a href="#edge-software-stack" class="hash-link" aria-label="Direct link to Edge Software Stack" title="Direct link to Edge Software Stack">​</a></h3>
+<div class="codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">Application Layer (Navigation, Manipulation, etc.)</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    ↓</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">AI Frameworks (PyTorch, TensorFlow, etc.)</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    ↓</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">Robot Middleware (ROS 2, etc.)</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    ↓</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">Edge Computing Platform (NVIDIA JetPack, etc.)</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    ↓</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">Hardware Abstraction Layer</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    ↓</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">Physical Hardware (Sensors, Actuators)</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="cloud-integration-patterns">Cloud Integration Patterns<a href="#cloud-integration-patterns" class="hash-link" aria-label="Direct link to Cloud Integration Patterns" title="Direct link to Cloud Integration Patterns">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="cloud-offloaded-processing">Cloud-Offloaded Processing<a href="#cloud-offloaded-processing" class="hash-link" aria-label="Direct link to Cloud-Offloaded Processing" title="Direct link to Cloud-Offloaded Processing">​</a></h3>
+<p>Some computations can be offloaded to cloud services:</p>
+<ul>
+<li><strong>Large Language Models</strong>: Processing for complex natural language understanding</li>
+<li><strong>Vision Processing</strong>: Heavy computer vision tasks</li>
+<li><strong>Planning</strong>: Complex path planning and task scheduling</li>
+<li><strong>Learning</strong>: Model training and updates</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="cloud-services-for-robotics">Cloud Services for Robotics<a href="#cloud-services-for-robotics" class="hash-link" aria-label="Direct link to Cloud Services for Robotics" title="Direct link to Cloud Services for Robotics">​</a></h3>
+<ol>
+<li>
+<p><strong>Compute Services</strong>: AWS EC2, Google Cloud Platform, Azure</p>
+<ul>
+<li>Scalable GPU instances for AI processing</li>
+<li>Auto-scaling for variable workloads</li>
+</ul>
+</li>
+<li>
+<p><strong>AI Services</strong>: Specialized AI/ML platforms</p>
+<ul>
+<li>Model hosting and serving</li>
+<li>Training and optimization services</li>
+</ul>
+</li>
+<li>
+<p><strong>Data Services</strong>: Storage and analytics</p>
+<ul>
+<li>Robot data logging and analysis</li>
+<li>Model training data management</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="communication-considerations">Communication Considerations<a href="#communication-considerations" class="hash-link" aria-label="Direct link to Communication Considerations" title="Direct link to Communication Considerations">​</a></h3>
+<ul>
+<li><strong>Latency Requirements</strong>: Critical functions must not depend on cloud</li>
+<li><strong>Bandwidth</strong>: High-bandwidth needs for sensor data</li>
+<li><strong>Reliability</strong>: Fallback mechanisms for network outages</li>
+<li><strong>Security</strong>: Encrypted communication and authentication</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="ros-2-deployment-patterns">ROS 2 Deployment Patterns<a href="#ros-2-deployment-patterns" class="hash-link" aria-label="Direct link to ROS 2 Deployment Patterns" title="Direct link to ROS 2 Deployment Patterns">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="single-machine-deployment">Single-Machine Deployment<a href="#single-machine-deployment" class="hash-link" aria-label="Direct link to Single-Machine Deployment" title="Direct link to Single-Machine Deployment">​</a></h3>
+<p>All ROS 2 nodes run on a single computer:</p>
+<div class="codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">Robot Computer</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">├── Sensor Nodes</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">├── Perception Nodes</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">├── Planning Nodes</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">├── Control Nodes</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">└── UI/Logging Nodes</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p><strong>Advantages:</strong></p>
+<ul>
+<li>Simple deployment and debugging</li>
+<li>Minimal network overhead</li>
+<li>Easier resource management</li>
+</ul>
+<p><strong>Disadvantages:</strong></p>
+<ul>
+<li>Single point of failure</li>
+<li>Resource contention</li>
+<li>Limited scalability</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="multi-machine-deployment">Multi-Machine Deployment<a href="#multi-machine-deployment" class="hash-link" aria-label="Direct link to Multi-Machine Deployment" title="Direct link to Multi-Machine Deployment">​</a></h3>
+<p>ROS 2 nodes distributed across multiple machines:</p>
+<div class="codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">Main Computer:</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">├── High-level Planning</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">├── UI/Supervision</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">└── Data Logging</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">Edge Computer:</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">├── Perception Processing</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">├── Low-level Control</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">└── Safety Systems</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">Optional Cloud:</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">└── Heavy AI Processing</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p><strong>Advantages:</strong></p>
+<ul>
+<li>Better resource utilization</li>
+<li>Improved fault tolerance</li>
+<li>Specialized hardware for specific tasks</li>
+</ul>
+<p><strong>Disadvantages:</strong></p>
+<ul>
+<li>Complex network configuration</li>
+<li>Additional failure points</li>
+<li>More complex debugging</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="containerization-for-robotics">Containerization for Robotics<a href="#containerization-for-robotics" class="hash-link" aria-label="Direct link to Containerization for Robotics" title="Direct link to Containerization for Robotics">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="docker-in-robotics">Docker in Robotics<a href="#docker-in-robotics" class="hash-link" aria-label="Direct link to Docker in Robotics" title="Direct link to Docker in Robotics">​</a></h3>
+<p>Containerization provides consistent deployment environments:</p>
+<ul>
+<li><strong>ROS 2 Docker Images</strong>: Pre-built environments with ROS 2</li>
+<li><strong>Dependency Management</strong>: Isolated package dependencies</li>
+<li><strong>Version Control</strong>: Consistent environments across machines</li>
+<li><strong>Deployment</strong>: Easy to deploy and update</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="kubernetes-for-robotic-systems">Kubernetes for Robotic Systems<a href="#kubernetes-for-robotic-systems" class="hash-link" aria-label="Direct link to Kubernetes for Robotic Systems" title="Direct link to Kubernetes for Robotic Systems">​</a></h3>
+<p>For complex deployments, Kubernetes can manage robotic systems:</p>
+<ul>
+<li><strong>Orchestration</strong>: Automated deployment and scaling</li>
+<li><strong>Service Discovery</strong>: Automatic component discovery</li>
+<li><strong>Resource Management</strong>: Efficient resource allocation</li>
+<li><strong>Rolling Updates</strong>: Zero-downtime updates</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="safety-and-reliability-considerations">Safety and Reliability Considerations<a href="#safety-and-reliability-considerations" class="hash-link" aria-label="Direct link to Safety and Reliability Considerations" title="Direct link to Safety and Reliability Considerations">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="safety-architecture">Safety Architecture<a href="#safety-architecture" class="hash-link" aria-label="Direct link to Safety Architecture" title="Direct link to Safety Architecture">​</a></h3>
+<p>Deployment architectures must include safety mechanisms:</p>
+<ul>
+<li><strong>Hardware Safety</strong>: Physical safety systems independent of software</li>
+<li><strong>Software Safety</strong>: Safety monitors and watchdogs</li>
+<li><strong>Redundancy</strong>: Backup systems for critical functions</li>
+<li><strong>Fail-Safe Modes</strong>: Safe states when systems fail</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="reliability-patterns">Reliability Patterns<a href="#reliability-patterns" class="hash-link" aria-label="Direct link to Reliability Patterns" title="Direct link to Reliability Patterns">​</a></h3>
+<ol>
+<li><strong>Heartbeat Monitoring</strong>: Regular status checks for system health</li>
+<li><strong>Graceful Degradation</strong>: System continues operating with reduced functionality</li>
+<li><strong>Automatic Recovery</strong>: Self-healing mechanisms for common failures</li>
+<li><strong>Error Isolation</strong>: Containment of failures to prevent cascading effects</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="fault-tolerance">Fault Tolerance<a href="#fault-tolerance" class="hash-link" aria-label="Direct link to Fault Tolerance" title="Direct link to Fault Tolerance">​</a></h3>
+<ul>
+<li><strong>N+1 Redundancy</strong>: Backup systems for critical components</li>
+<li><strong>Watchdog Systems</strong>: Automatic restart of failed components</li>
+<li><strong>State Persistence</strong>: Recovery from failures without losing state</li>
+<li><strong>Rollback Mechanisms</strong>: Ability to revert to previous stable states</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="performance-optimization">Performance Optimization<a href="#performance-optimization" class="hash-link" aria-label="Direct link to Performance Optimization" title="Direct link to Performance Optimization">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="resource-management">Resource Management<a href="#resource-management" class="hash-link" aria-label="Direct link to Resource Management" title="Direct link to Resource Management">​</a></h3>
+<ul>
+<li><strong>CPU Scheduling</strong>: Real-time scheduling for critical tasks</li>
+<li><strong>GPU Sharing</strong>: Efficient GPU resource allocation</li>
+<li><strong>Memory Management</strong>: Optimized memory usage for embedded systems</li>
+<li><strong>Power Management</strong>: Efficient power usage for mobile robots</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="communication-optimization">Communication Optimization<a href="#communication-optimization" class="hash-link" aria-label="Direct link to Communication Optimization" title="Direct link to Communication Optimization">​</a></h3>
+<ul>
+<li><strong>Message Filtering</strong>: Reduce unnecessary data transmission</li>
+<li><strong>Data Compression</strong>: Compress sensor data when possible</li>
+<li><strong>Quality of Service</strong>: Prioritize critical messages</li>
+<li><strong>Bandwidth Management</strong>: Optimize network usage</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="security-considerations">Security Considerations<a href="#security-considerations" class="hash-link" aria-label="Direct link to Security Considerations" title="Direct link to Security Considerations">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="network-security">Network Security<a href="#network-security" class="hash-link" aria-label="Direct link to Network Security" title="Direct link to Network Security">​</a></h3>
+<ul>
+<li><strong>Encryption</strong>: Encrypted communication between components</li>
+<li><strong>Authentication</strong>: Secure access to robotic systems</li>
+<li><strong>Firewall Configuration</strong>: Proper network security</li>
+<li><strong>VPN</strong>: Secure remote access when needed</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="data-security">Data Security<a href="#data-security" class="hash-link" aria-label="Direct link to Data Security" title="Direct link to Data Security">​</a></h3>
+<ul>
+<li><strong>Data Encryption</strong>: Protect sensitive data at rest</li>
+<li><strong>Access Control</strong>: Limit access to robot systems</li>
+<li><strong>Audit Logging</strong>: Track system access and changes</li>
+<li><strong>Secure Boot</strong>: Ensure system integrity</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="deployment-tools-and-practices">Deployment Tools and Practices<a href="#deployment-tools-and-practices" class="hash-link" aria-label="Direct link to Deployment Tools and Practices" title="Direct link to Deployment Tools and Practices">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="cicd-for-robotics">CI/CD for Robotics<a href="#cicd-for-robotics" class="hash-link" aria-label="Direct link to CI/CD for Robotics" title="Direct link to CI/CD for Robotics">​</a></h3>
+<p>Continuous Integration/Continuous Deployment for robotic systems:</p>
+<ul>
+<li><strong>Automated Testing</strong>: Test code changes in simulation</li>
+<li><strong>Build Pipelines</strong>: Automated build and packaging</li>
+<li><strong>Deployment Automation</strong>: Automated deployment to robots</li>
+<li><strong>Rollback Procedures</strong>: Automated rollback for failed deployments</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="configuration-management">Configuration Management<a href="#configuration-management" class="hash-link" aria-label="Direct link to Configuration Management" title="Direct link to Configuration Management">​</a></h3>
+<ul>
+<li><strong>Parameter Servers</strong>: Centralized configuration management</li>
+<li><strong>Environment Variables</strong>: Runtime configuration</li>
+<li><strong>Configuration Files</strong>: Structured configuration storage</li>
+<li><strong>Version Control</strong>: Track configuration changes</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="references">References<a href="#references" class="hash-link" aria-label="Direct link to References" title="Direct link to References">​</a></h2>
+<ul>
+<li><a href="https://docs.ros.org/en/rolling/How-To-Guides/Deployment.html" target="_blank" rel="noopener noreferrer">ROS 2 Deployment Guide</a></li>
+<li><a href="https://arxiv.org/abs/2008.09300" target="_blank" rel="noopener noreferrer">Edge Computing for Robotics: A Survey</a></li>
+<li><a href="https://ieeexplore.ieee.org/document/8460796" target="_blank" rel="noopener noreferrer">Cloud Robotics: Research and Applications</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="practical-examples">Practical Examples<a href="#practical-examples" class="hash-link" aria-label="Direct link to Practical Examples" title="Direct link to Practical Examples">​</a></h2>
+<p>To explore deployment architectures, try these examples:</p>
+<p><strong>Simulated Deployment Example:</strong></p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token builtin class-name">cd</span><span class="token plain"> docs/module4/examples</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">python simulated_deployment.py</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>This example demonstrates a simulated deployment system with hardware simulation, safety monitoring, and system management.</p>
+<p><strong>Deployment Checklist:</strong></p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token builtin class-name">cd</span><span class="token plain"> docs/module4/examples</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token function" style="color:#d73a49">cat</span><span class="token plain"> deployment_checklist.md</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>This comprehensive checklist covers key considerations for deploying robotic systems in real-world environments.</p>
+<hr>
+<p><strong>Previous</strong>: <a href="/humanoid_robotic_book/docs/module4/sim_to_real">Simulation to Real-World Transition</a> | <strong>Next</strong>: <a href="/humanoid_robotic_book/docs/module4/ros2_hardware_deploy">ROS 2 Deployment on Robot Hardware</a> | <a href="/humanoid_robotic_book/docs/README.md">Table of Contents</a></p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"><a href="https://github.com/Akber261986/humanoid_robotic_book/edit/main/docs/module4/deployment_arch.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_vwxv"></div></div></footer></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="Docs pages"></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#overview" class="table-of-contents__link toc-highlight">Overview</a></li><li><a href="#architectural-patterns" class="table-of-contents__link toc-highlight">Architectural Patterns</a><ul><li><a href="#1-centralized-architecture" class="table-of-contents__link toc-highlight">1. Centralized Architecture</a></li><li><a href="#2-distributed-architecture" class="table-of-contents__link toc-highlight">2. Distributed Architecture</a></li><li><a href="#3-hybrid-architecture" class="table-of-contents__link toc-highlight">3. Hybrid Architecture</a></li></ul></li><li><a href="#edge-computing-for-robotics" class="table-of-contents__link toc-highlight">Edge Computing for Robotics</a><ul><li><a href="#local-processing-requirements" class="table-of-contents__link toc-highlight">Local Processing Requirements</a></li><li><a href="#edge-hardware-options" class="table-of-contents__link toc-highlight">Edge Hardware Options</a></li><li><a href="#edge-software-stack" class="table-of-contents__link toc-highlight">Edge Software Stack</a></li></ul></li><li><a href="#cloud-integration-patterns" class="table-of-contents__link toc-highlight">Cloud Integration Patterns</a><ul><li><a href="#cloud-offloaded-processing" class="table-of-contents__link toc-highlight">Cloud-Offloaded Processing</a></li><li><a href="#cloud-services-for-robotics" class="table-of-contents__link toc-highlight">Cloud Services for Robotics</a></li><li><a href="#communication-considerations" class="table-of-contents__link toc-highlight">Communication Considerations</a></li></ul></li><li><a href="#ros-2-deployment-patterns" class="table-of-contents__link toc-highlight">ROS 2 Deployment Patterns</a><ul><li><a href="#single-machine-deployment" class="table-of-contents__link toc-highlight">Single-Machine Deployment</a></li><li><a href="#multi-machine-deployment" class="table-of-contents__link toc-highlight">Multi-Machine Deployment</a></li></ul></li><li><a href="#containerization-for-robotics" class="table-of-contents__link toc-highlight">Containerization for Robotics</a><ul><li><a href="#docker-in-robotics" class="table-of-contents__link toc-highlight">Docker in Robotics</a></li><li><a href="#kubernetes-for-robotic-systems" class="table-of-contents__link toc-highlight">Kubernetes for Robotic Systems</a></li></ul></li><li><a href="#safety-and-reliability-considerations" class="table-of-contents__link toc-highlight">Safety and Reliability Considerations</a><ul><li><a href="#safety-architecture" class="table-of-contents__link toc-highlight">Safety Architecture</a></li><li><a href="#reliability-patterns" class="table-of-contents__link toc-highlight">Reliability Patterns</a></li><li><a href="#fault-tolerance" class="table-of-contents__link toc-highlight">Fault Tolerance</a></li></ul></li><li><a href="#performance-optimization" class="table-of-contents__link toc-highlight">Performance Optimization</a><ul><li><a href="#resource-management" class="table-of-contents__link toc-highlight">Resource Management</a></li><li><a href="#communication-optimization" class="table-of-contents__link toc-highlight">Communication Optimization</a></li></ul></li><li><a href="#security-considerations" class="table-of-contents__link toc-highlight">Security Considerations</a><ul><li><a href="#network-security" class="table-of-contents__link toc-highlight">Network Security</a></li><li><a href="#data-security" class="table-of-contents__link toc-highlight">Data Security</a></li></ul></li><li><a href="#deployment-tools-and-practices" class="table-of-contents__link toc-highlight">Deployment Tools and Practices</a><ul><li><a href="#cicd-for-robotics" class="table-of-contents__link toc-highlight">CI/CD for Robotics</a></li><li><a href="#configuration-management" class="table-of-contents__link toc-highlight">Configuration Management</a></li></ul></li><li><a href="#references" class="table-of-contents__link toc-highlight">References</a></li><li><a href="#practical-examples" class="table-of-contents__link toc-highlight">Practical Examples</a></li></ul></div></div></div></div></main></div></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="col footer__col"><div class="footer__title">Content</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/humanoid_robotic_book/docs/module1/intro_physical_ai">Module 1: Foundations</a></li><li class="footer__item"><a class="footer__link-item" href="/humanoid_robotic_book/docs/module2/ros2_setup">Module 2: Simulation</a></li></ul></div><div class="col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://stackoverflow.com/questions/tagged/docusaurus" target="_blank" rel="noopener noreferrer" class="footer__link-item">Stack Overflow<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a></li><li class="footer__item"><a href="https://discordapp.com/invite/docusaurus" target="_blank" rel="noopener noreferrer" class="footer__link-item">Discord<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a></li></ul></div><div class="col footer__col"><div class="footer__title">More</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/Akber261986/humanoid_robotic_book" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2025 Physical AI & Humanoid Robotics Book. Built with Docusaurus.</div></div></div></footer></div>
+</body>
+</html>
