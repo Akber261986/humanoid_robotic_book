@@ -29,6 +29,39 @@ const sidebars = {
         },
       ],
     },
+    {
+      type: 'category',
+      label: 'Module 3: VLA Integration',
+      items: [
+        'module3/intro_vla',
+        'module3/vla_architectures',
+        'module3/openvl-isaaclab',
+        {
+          type: 'category',
+          label: 'Examples',
+          items: [
+            'module3/examples/vla_command_parsing',
+            'module3/examples/visual_grounding',
+          ],
+        },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Module 4: Deployment',
+      items: [
+        'module4/sim_to_real',
+        'module4/deployment_arch',
+        'module4/ros2_hardware_deploy',
+        {
+          type: 'category',
+          label: 'Examples',
+          items: [
+            'module4/examples/deployment_checklist',
+          ],
+        },
+      ],
+    },
   ],
 };
 
