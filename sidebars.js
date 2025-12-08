@@ -36,14 +36,6 @@ const sidebars = {
         'module3/intro_vla',
         'module3/vla_architectures',
         'module3/openvl-isaaclab',
-        {
-          type: 'category',
-          label: 'Examples',
-          items: [
-            'module3/examples/vla_command_parsing',
-            'module3/examples/visual_grounding',
-          ],
-        },
       ],
     },
     {
