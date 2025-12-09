@@ -1,0 +1,14 @@
+{
+  "name": "humanoid-robotics-book-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Physical AI & Humanoid Robotics book RAG chatbot with Google Gemini integration",
+  "main": "api/main.py",
+  "scripts": {
+    "start": "uvicorn backend.api.main:app --reload --host 0.0.0.0 --port 8000",
+    "dev": "uvicorn backend.api.main:app --reload --host 0.0.0.0 --port 8000",
+    "ingest": "python backend/scripts/ingest_docs.py"
+  },
+  "keywords": ["rag", "qdrant", "gemini", "docusaurus", "chatbot", "google-generative-ai"],
+  "author": "Physical AI & Humanoid Robotics Book",
+  "license": "MIT"
+}

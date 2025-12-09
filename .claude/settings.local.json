@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(python -m py_compile docs/module3/examples/vla_command_parsing.py docs/module3/examples/visual_grounding.py docs/module4/examples/simulated_deployment.py)",
-      "Bash(python3 -m py_compile docs/module3/examples/vla_command_parsing.py docs/module3/examples/visual_grounding.py docs/module4/examples/simulated_deployment.py)"
+      "Bash(python3 -m py_compile docs/module3/examples/vla_command_parsing.py docs/module3/examples/visual_grounding.py docs/module4/examples/simulated_deployment.py)",
+      "SlashCommand(/sp.constitution)",
+      "SlashCommand(/sp.specify)",
+      "SlashCommand(/sp.plan)",
+      "Bash(chmod +x deploy.sh)"
     ]
   },
   "disabledMcpjsonServers": [

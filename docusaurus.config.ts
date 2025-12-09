@@ -66,6 +66,11 @@ const config: Config = {
             label: 'Read Book',
           },
           {
+            to: '/chat',
+            label: 'Ask the Book',
+            position: 'left',
+          },
+          {
             href: 'https://github.com/Akber261986/humanoid_robotic_book',
             label: 'GitHub',
             position: 'right',
