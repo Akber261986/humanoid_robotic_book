@@ -21,7 +21,7 @@ load_dotenv()
 # Configure Google Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
-QDRANT_URL = os.getenv("QDRANT_URL", "https://7118c77f-72dd-44cc-ae76-7845348d45e0.europe-west3-0.gcp.cloud.qdrant.io")  # Update with your Qdrant cluster URL
+QDRANT_URL = os.getenv("QDRANT_URL")  # Update with your Qdrant cluster URL
 QDRANT_COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", "humanoid_robotics_book")
 
 if not GEMINI_API_KEY:
