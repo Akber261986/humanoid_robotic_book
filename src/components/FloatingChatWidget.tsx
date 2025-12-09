@@ -40,7 +40,7 @@ const FloatingChatWidget: React.FC = () => {
 
     try {
       // Call the backend API to explain selected text
-      const response = await fetch('http://localhost:8000/explain-selected', {
+      const response = await fetch('https://humanoidroboticbook-production.up.railway.app/explain-selected', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ const FloatingChatWidget: React.FC = () => {
 
     try {
       // Call the backend API
-      const response = await fetch('http://localhost:8000/query', {
+      const response = await fetch('https://humanoidroboticbook-production.up.railway.app/query', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
