@@ -12,14 +12,14 @@ from typing import List, Dict, Any
 import hashlib
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
-from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
-# Initialize local embedding model (all-MiniLM-L6-v2 is lightweight but effective)
-embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+# Initialize local embedding model (efficient and lightweight)
+embedding_model = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
 
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 QDRANT_URL = os.getenv("QDRANT_URL")  # Update with your Qdrant cluster URL
@@ -67,10 +67,11 @@ def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 100) -> List[st
     return chunks
 
 def get_embedding(text: str) -> List[float]:
-    """Get embedding for text using local sentence transformer model."""
+    """Get embedding for text using fastembed local model."""
     try:
-        embedding = embedding_model.encode([text])
-        return embedding[0].tolist()  # Convert numpy array to list
+        # The fastembed model returns a generator, so we need to get the first result
+        embedding = list(embedding_model.embed([text]))[0]
+        return embedding.tolist()  # Convert to list
     except Exception as e:
         print(f"Error getting embedding for text: {str(e)}")
         return []
@@ -85,11 +86,11 @@ def create_qdrant_collection(client: QdrantClient, collection_name: str):
         print(f"Collection '{collection_name}' already exists. Recreating...")
         client.delete_collection(collection_name)
 
-    # Create new collection with appropriate vector size for sentence transformer embeddings
+    # Create new collection with appropriate vector size for BGE embeddings
     client.create_collection(
         collection_name=collection_name,
         vectors_config=models.VectorParams(
-            size=384,  # all-MiniLM-L6-v2 returns 384-dimensional vectors
+            size=384,  # BGE small model returns 384-dimensional vectors
             distance=models.Distance.COSINE
         )
     )

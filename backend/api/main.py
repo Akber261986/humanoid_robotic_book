@@ -14,7 +14,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 import asyncio
 import json
-from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
 
 # Load environment variables
 load_dotenv()
@@ -35,7 +35,7 @@ if not GEMINI_API_KEY:
 genai.configure(api_key=GEMINI_API_KEY)
 
 # Initialize local embedding model for retrieval
-embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+embedding_model = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
 
 # Initialize clients
 qdrant_client = QdrantClient(
@@ -75,10 +75,11 @@ class HealthResponse(BaseModel):
     collections: List[str]
 
 def get_embedding(text: str) -> List[float]:
-    """Get embedding for text using local sentence transformer model."""
+    """Get embedding for text using fastembed local model."""
     try:
-        embedding = embedding_model.encode([text])
-        return embedding[0].tolist()  # Convert numpy array to list
+        # The fastembed model returns a generator, so we need to get the first result
+        embedding = list(embedding_model.embed([text]))[0]
+        return embedding.tolist()  # Convert to list
     except Exception as e:
         logger.error(f"Error getting embedding for text: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error getting embedding: {str(e)}")
