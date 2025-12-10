@@ -6,3 +6,5 @@ python-dotenv==1.0.0
 markdown==3.5.1
 pydantic==2.5.0
 python-multipart==0.0.6
+sentence-transformers==2.6.1
+torch==2.1.2
