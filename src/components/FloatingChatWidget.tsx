@@ -114,8 +114,43 @@ const FloatingChatWidget: React.FC = () => {
     setInputValue('');
     setIsLoading(true);
 
+    // Check if the input is a simple greeting
+    const greetingPattern = /^(hi|hello|hey|greetings|good morning|good afternoon|good evening|good night|bye|goodbye|thanks|thank you)$/i;
+    if (greetingPattern.test(inputValue.trim())) {
+      // Respond directly without API call
+      const responses: Record<string, string> = {
+        'hi': 'Hello there! I\'m your Physical AI & Humanoid Robotics book assistant. Ask me anything about the book content!',
+        'hello': 'Hi there! I\'m your Physical AI & Humanoid Robotics book assistant. Ask me anything about the book content!',
+        'hey': 'Hey! I\'m here to help you with questions about the Physical AI & Humanoid Robotics book. What would you like to know?',
+        'greetings': 'Greetings! I\'m your Physical AI & Humanoid Robotics book assistant. Feel free to ask me about the book content!',
+        'good morning': 'Good morning! I hope you\'re having a great day learning about Physical AI & Humanoid Robotics. How can I assist you today?',
+        'good afternoon': 'Good afternoon! I\'m your Physical AI & Humanoid Robotics book assistant. What would you like to explore today?',
+        'good evening': 'Good evening! I\'m here to help with your Physical AI & Humanoid Robotics questions. What can I help you with?',
+        'bye': 'Goodbye! Feel free to return if you have more questions about the Physical AI & Humanoid Robotics book.',
+        'goodbye': 'Goodbye! Feel free to return if you have more questions about the Physical AI & Humanoid Robotics book.',
+        'thanks': 'You\'re welcome! Is there anything else you\'d like to know about the book?',
+        'thank you': 'You\'re very welcome! Let me know if you have more questions about the Physical AI & Humanoid Robotics book.'
+      };
+
+      const greetingKey = Object.keys(responses).find(key =>
+        inputValue.trim().toLowerCase().startsWith(key) ||
+        key.startsWith(inputValue.trim().toLowerCase())
+      );
+
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: greetingKey ? responses[greetingKey] : 'Hello! I\'m your Physical AI & Humanoid Robotics book assistant. Ask me anything about the book content!',
+        role: 'assistant',
+        timestamp: new Date(),
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      // Call the backend API
+      // Call the backend API for non-greeting queries
       const response = await fetch('https://humanoidroboticbook-production.up.railway.app/query', {
         method: 'POST',
         headers: {
