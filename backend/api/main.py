@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 FastAPI backend with Google Generative AI integration for the Physical AI & Humanoid Robotics book chatbot.
-This backend provides endpoints for RAG-based question answering using Qdrant and Google Gemini.
+This backend provides endpoints for RAG-based question answering using Qdrant and local embeddings.
 """
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,6 +14,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 import asyncio
 import json
+from sentence_transformers import SentenceTransformer
 
 # Load environment variables
 load_dotenv()
@@ -32,6 +33,9 @@ if not GEMINI_API_KEY:
     raise ValueError("GEMINI_API_KEY environment variable is required")
 
 genai.configure(api_key=GEMINI_API_KEY)
+
+# Initialize local embedding model for retrieval
+embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
 
 # Initialize clients
 qdrant_client = QdrantClient(
@@ -71,14 +75,10 @@ class HealthResponse(BaseModel):
     collections: List[str]
 
 def get_embedding(text: str) -> List[float]:
-    """Get embedding for text using Google Gemini embedding-001 model."""
+    """Get embedding for text using local sentence transformer model."""
     try:
-        result = genai.embed_content(
-            model="models/embedding-001",
-            content=text,
-            task_type="retrieval_query"  # Using retrieval_query for search queries
-        )
-        return result['embedding']
+        embedding = embedding_model.encode([text])
+        return embedding[0].tolist()  # Convert numpy array to list
     except Exception as e:
         logger.error(f"Error getting embedding for text: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error getting embedding: {str(e)}")

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Ingestion script for Physical AI & Humanoid Robotics book content into Qdrant vector database.
-This script reads all Markdown files from the docs directory, chunks them, embeds with Google Gemini,
+This script reads all Markdown files from the docs directory, chunks them, embeds with a local model,
 and uploads to Qdrant.
 """
 import os
@@ -12,22 +12,18 @@ from typing import List, Dict, Any
 import hashlib
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
-import google.generativeai as genai
+from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
-# Configure Google Gemini API
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+# Initialize local embedding model (all-MiniLM-L6-v2 is lightweight but effective)
+embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 QDRANT_URL = os.getenv("QDRANT_URL")  # Update with your Qdrant cluster URL
 QDRANT_COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", "humanoid_robotics_book")
-
-if not GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY environment variable is required")
-
-genai.configure(api_key=GEMINI_API_KEY)
 
 def read_markdown_files(docs_path: str) -> List[Dict[str, Any]]:
     """Read all markdown files from the docs directory and extract content with metadata."""
@@ -71,14 +67,10 @@ def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 100) -> List[st
     return chunks
 
 def get_embedding(text: str) -> List[float]:
-    """Get embedding for text using Google Gemini embedding-001 model."""
+    """Get embedding for text using local sentence transformer model."""
     try:
-        result = genai.embed_content(
-            model="models/embedding-001",
-            content=text,
-            task_type="retrieval_document"
-        )
-        return result['embedding']
+        embedding = embedding_model.encode([text])
+        return embedding[0].tolist()  # Convert numpy array to list
     except Exception as e:
         print(f"Error getting embedding for text: {str(e)}")
         return []
@@ -93,11 +85,11 @@ def create_qdrant_collection(client: QdrantClient, collection_name: str):
         print(f"Collection '{collection_name}' already exists. Recreating...")
         client.delete_collection(collection_name)
 
-    # Create new collection with appropriate vector size for Gemini embeddings
+    # Create new collection with appropriate vector size for sentence transformer embeddings
     client.create_collection(
         collection_name=collection_name,
         vectors_config=models.VectorParams(
-            size=768,  # Gemini embedding-001 returns 768-dimensional vectors
+            size=384,  # all-MiniLM-L6-v2 returns 384-dimensional vectors
             distance=models.Distance.COSINE
         )
     )
