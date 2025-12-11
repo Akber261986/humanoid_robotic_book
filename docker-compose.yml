@@ -1,8 +1,25 @@
 version: '3.8'
 
 services:
+  migrate:
+    build: .
+    command: python scripts/ingest_docs.py
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
+      - QDRANT_URL=${QDRANT_URL}
+      - QDRANT_COLLECTION_NAME=${QDRANT_COLLECTION_NAME}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    env_file:
+      - .env
+    volumes:
+      - ./docs:/app/docs
+    depends_on:
+      - qdrant
+    restart: "no"
+
   backend:
-    build: ./backend
+    build: .
     ports:
       - "8000:8000"
     environment:
@@ -12,7 +29,7 @@ services:
       - QDRANT_COLLECTION_NAME=${QDRANT_COLLECTION_NAME}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     env_file:
-      - ./backend/.env
+      - .env
     depends_on:
       - qdrant
     restart: unless-stopped

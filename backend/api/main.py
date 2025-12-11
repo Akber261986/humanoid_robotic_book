@@ -34,8 +34,8 @@ if not GEMINI_API_KEY:
 
 genai.configure(api_key=GEMINI_API_KEY)
 
-# Initialize local embedding model for retrieval
-embedding_model = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
+# Initialize local embedding model for retrieval (lazy loading)
+embedding_model = None
 
 # Initialize clients
 qdrant_client = QdrantClient(
@@ -76,7 +76,15 @@ class HealthResponse(BaseModel):
 
 def get_embedding(text: str) -> List[float]:
     """Get embedding for text using fastembed local model."""
+    global embedding_model
+
     try:
+        # Initialize the embedding model if not already loaded
+        if embedding_model is None:
+            logger.info("Initializing embedding model...")
+            embedding_model = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
+            logger.info("Embedding model initialized successfully")
+
         # The fastembed model returns a generator, so we need to get the first result
         embedding = list(embedding_model.embed([text]))[0]
         return embedding.tolist()  # Convert to list

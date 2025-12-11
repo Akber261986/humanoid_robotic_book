@@ -14,17 +14,18 @@ COPY requirements.txt .
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Pre-download the embedding model during build
+RUN python -c "from fastembed import TextEmbedding; TextEmbedding(model_name='BAAI/bge-small-en-v1.5')"
+
 # Copy the entire backend directory to the working directory
 COPY backend/ .
 
 # Expose port (will be overridden by ${PORT} environment variable)
 EXPOSE 8000
 
-# Create a startup script that runs ingestion first, then starts the server
+# Create a startup script that starts the server immediately to avoid Railway timeouts
 RUN echo '#!/bin/bash\n\
-echo "Starting ingestion process..."\n\
-python scripts/ingest_docs.py\n\
-echo "Ingestion completed. Starting server..."\n\
+echo "Starting server..."\n\
 uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}' > startup.sh && \
 chmod +x startup.sh
 

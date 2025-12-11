@@ -18,8 +18,8 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Initialize local embedding model (efficient and lightweight)
-embedding_model = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
+# Initialize local embedding model (efficient and lightweight) - will be set to None initially for potential lazy loading
+embedding_model = None
 
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 QDRANT_URL = os.getenv("QDRANT_URL")  # Update with your Qdrant cluster URL
@@ -68,7 +68,15 @@ def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 100) -> List[st
 
 def get_embedding(text: str) -> List[float]:
     """Get embedding for text using fastembed local model."""
+    global embedding_model
+
     try:
+        # Initialize the embedding model if not already loaded
+        if embedding_model is None:
+            print("Initializing embedding model...")
+            embedding_model = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
+            print("Embedding model initialized successfully")
+
         # The fastembed model returns a generator, so we need to get the first result
         embedding = list(embedding_model.embed([text]))[0]
         return embedding.tolist()  # Convert to list
