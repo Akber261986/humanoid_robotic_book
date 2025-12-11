@@ -10,8 +10,13 @@ import markdown
 from pathlib import Path
 from typing import List, Dict, Any
 import hashlib
+import warnings
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
+
+# Suppress the deprecation warning from fastembed
+warnings.filterwarnings("ignore", message=".*DefaultEmbedding, FlagEmbedding, JinaEmbedding are deprecated.*", category=UserWarning, module="fastembed")
+
 from fastembed import TextEmbedding
 from dotenv import load_dotenv
 

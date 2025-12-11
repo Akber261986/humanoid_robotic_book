@@ -9,11 +9,16 @@ from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 import os
 import logging
+import warnings
 from qdrant_client import QdrantClient
 import google.generativeai as genai
 from dotenv import load_dotenv
 import asyncio
 import json
+
+# Suppress the deprecation warning from fastembed
+warnings.filterwarnings("ignore", message=".*DefaultEmbedding, FlagEmbedding, JinaEmbedding are deprecated.*", category=UserWarning, module="fastembed")
+
 from fastembed import TextEmbedding
 
 # Load environment variables
