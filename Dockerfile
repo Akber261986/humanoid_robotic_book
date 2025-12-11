@@ -24,11 +24,11 @@ COPY backend/ .
 # Expose port (will be overridden by ${PORT} environment variable)
 EXPOSE 8000
 
-# Create a startup script that starts the server immediately to avoid Railway timeouts and suppresses fastembed warnings
+# Create a startup script that starts the server immediately to avoid Railway timeouts and suppresses fastembed warnings using wrapper
 RUN echo '#!/bin/bash\n\
 echo "Starting server..."\n\
 export PYTHONPATH=/app:$PYTHONPATH\n\
-exec python -W ignore::UserWarning:fastembed.embedding -m uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}' > startup.sh && \
+exec python -m api.app_loader' > startup.sh && \
 chmod +x startup.sh
 
 # Run the startup script
