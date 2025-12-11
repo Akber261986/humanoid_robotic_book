@@ -27,8 +27,8 @@ EXPOSE 8000
 # Create a startup script that starts the server immediately to avoid Railway timeouts and suppresses fastembed warnings
 RUN echo '#!/bin/bash\n\
 echo "Starting server..."\n\
-export PYTHONWARNINGS="ignore::UserWarning:fastembed.embedding"\n\
-uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}' > startup.sh && \
+export PYTHONPATH=/app:$PYTHONPATH\n\
+exec python -W ignore::UserWarning:fastembed.embedding -m uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}' > startup.sh && \
 chmod +x startup.sh
 
 # Run the startup script
