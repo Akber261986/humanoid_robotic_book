@@ -6,7 +6,7 @@ dockerfilePath = "backend/Dockerfile"
 
 [deploy]
 startCommand = "python -m backend.src.api.main"
-restartPolicyType = "on-failure"
+restartPolicy = "on-failure"
 restartPolicyMaxRetries = 3
 concurrentBuilds = 1
 
