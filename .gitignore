@@ -81,3 +81,30 @@ config/
 # Temporary files
 *.tmp
 *.temp
+
+# Backend specific
+backend/__pycache__/
+backend/venv/
+backend/.venv/
+backend/.env
+
+# Frontend specific
+frontend/__pycache__/
+frontend/venv/
+frontend/.venv/
+frontend/.env
+
+# Data and cache
+*.db
+*.db-journal
+.qdrant/
+data/
+
+# Testing
+.pytest_cache/
+.coverage/
+htmlcov/
+.hypothesis/
+
+# Logs
+logs/
