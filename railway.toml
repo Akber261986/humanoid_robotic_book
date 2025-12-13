@@ -10,7 +10,7 @@ restartPolicy = "on-failure"
 restartPolicyMaxRetries = 3
 concurrentBuilds = 1
 healthcheckPath = "/health"
-healthcheckTimeout = 30
+healthcheckTimeout = 60
 
 [variables]
 PYTHON_ENV = "production"

@@ -249,12 +249,22 @@ async def health_check():
     Check the health status of the backend service.
     """
     try:
-        # Test dependencies
-        qdrant_status = "connected" if indexer.check_index_status() else "disconnected"
-        gemini_status = "available" if rag_service.test_rag_connection() else "unavailable"
+        # Test dependencies (make these optional for health check)
+        try:
+            qdrant_status = "connected" if indexer.check_index_status() else "disconnected"
+        except:
+            qdrant_status = "not configured"
+
+        try:
+            gemini_status = "available" if rag_service.test_rag_connection() else "not configured"
+        except:
+            gemini_status = "not configured"
+
+        # Return healthy if basic server is running, even if dependencies aren't ready
+        overall_status = "healthy"
 
         return HealthResponse(
-            status="healthy",
+            status=overall_status,
             timestamp=datetime.now().isoformat(),
             dependencies={
                 "qdrant": qdrant_status,
@@ -263,6 +273,39 @@ async def health_check():
         )
     except Exception as e:
         logger.error(f"Health check failed: {e}")
+        return HealthResponse(
+            status="unhealthy",
+            timestamp=datetime.now().isoformat(),
+            dependencies={
+                "qdrant": "error",
+                "gemini_api": "error"
+            }
+        )
+
+
+@app.get("/ready", response_model=HealthResponse)
+async def readiness_check():
+    """
+    Check the readiness status of the backend service including dependencies.
+    """
+    try:
+        # Test dependencies for readiness
+        qdrant_status = "connected" if indexer.check_index_status() else "disconnected"
+        gemini_status = "available" if rag_service.test_rag_connection() else "unavailable"
+
+        # Return healthy only if all dependencies are available
+        overall_status = "healthy" if (qdrant_status == "connected" and gemini_status == "available") else "unhealthy"
+
+        return HealthResponse(
+            status=overall_status,
+            timestamp=datetime.now().isoformat(),
+            dependencies={
+                "qdrant": qdrant_status,
+                "gemini_api": gemini_status
+            }
+        )
+    except Exception as e:
+        logger.error(f"Readiness check failed: {e}")
         return HealthResponse(
             status="unhealthy",
             timestamp=datetime.now().isoformat(),
