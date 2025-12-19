@@ -6,3 +6,36 @@
  */
 
 /* You can override the default Docusaurus styling here. */
+
+/* Custom color theme - restoring magenta/purple primary color */
+:root {
+  --ifm-color-primary: #d63384; /* Magenta color */
+  --ifm-color-primary-dark: #c22a75;
+  --ifm-color-primary-darker: #b5276e;
+  --ifm-color-primary-darkest: #99215e;
+  --ifm-color-primary-light: #da4a91;
+  --ifm-color-primary-lighter: #dd589a;
+  --ifm-color-primary-lightest: #e680af;
+}
+
+/* Additional styling for better appearance */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Style for selected text if needed */
+::selection {
+  background-color: #d63384;
+  color: white;
+}
+
+/* Ensure buttons and links use the custom color */
+.button--primary {
+  background-color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+}
+
+.button--primary:hover {
+  background-color: var(--ifm-color-primary-dark);
+  border-color: var(--ifm-color-primary-dark);
+}

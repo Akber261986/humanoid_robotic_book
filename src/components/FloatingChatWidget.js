@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
+import { useBaseUrl } from '@docusaurus/useBaseUrl';
 import './FloatingChatWidget.css';
 
 const FloatingChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const chatUrl = useBaseUrl('/chat');
 
   const toggleChat = () => {
     if (!isOpen) {
@@ -30,7 +32,7 @@ const FloatingChatWidget = () => {
           </div>
           <div className="chat-content">
             <iframe
-              src="/chat"
+              src={chatUrl}
               title="Humanoid Robotics Chat"
               className="chat-iframe"
               frameBorder="0"
