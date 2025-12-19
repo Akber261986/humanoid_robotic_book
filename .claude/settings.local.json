@@ -24,7 +24,10 @@
       "Bash(pip install pydantic==2.9.2)",
       "Bash(pip install google-generativeai==0.8.3)",
       "Bash(python -c \"import sys; sys.path.insert(0, ''.''); from src.api.main import app; print(''Backend import successful'')\")",
-      "Bash(python verify_setup.py)"
+      "Bash(python verify_setup.py)",
+      "Bash(git push origin 001-rag-chatbot)",
+      "Bash(git add backend/Dockerfile)",
+      "Bash(git add backend/src/api/main.py railway.toml)"
     ]
   },
   "disabledMcpjsonServers": [
