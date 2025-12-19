@@ -6,7 +6,6 @@ dockerfilePath = "backend/Dockerfile"
 startCommand = "cd backend && python main.py"
 restartPolicy = "on-failure"
 restartPolicyMaxRetries = 3
-concurrentBuilds = 1
 
 [variables]
 PORT = "8000"
