@@ -8,15 +8,36 @@ app = FastAPI(title="Humanoid Robotics Book API", version="1.0.0")
 
 @app.get("/")
 def read_root():
-    return {"message": "Humanoid Robotics Book API", "endpoints": ["/trigger-index", "/query-book"]}
+    return {"message": "Humanoid Robotics Book API", "endpoints": ["/trigger-index", "/embed-book", "/query-book"]}
 
 @app.post("/trigger-index")
 def trigger_index():
-    """Trigger the script to process book markdown files"""
+    """Trigger the script to process book markdown files (simple processing)"""
     try:
-        # This would run your indexing script
+        # Run simple processing
         result = subprocess.run(
-            ["python", "process_book.py"],
+            ["python", "../process_book.py"],
+            capture_output=True,
+            text=True,
+            cwd="."
+        )
+
+        return {
+            "status": "success" if result.returncode == 0 else "error",
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+            "return_code": result.returncode
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@app.post("/embed-book")
+def embed_book():
+    """Trigger the script to embed book content to Qdrant"""
+    try:
+        # Run embedding to Qdrant
+        result = subprocess.run(
+            ["python", "../process_book.py", "embed"],
             capture_output=True,
             text=True,
             cwd="."
@@ -40,7 +61,7 @@ def query_book(query: str = None):
     # Simple keyword matching in markdown files
     try:
         results = []
-        docs_path = "./docs"
+        docs_path = "../docs"
 
         for root, dirs, files in os.walk(docs_path):
             for file in files:
