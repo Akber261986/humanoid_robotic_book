@@ -16,10 +16,9 @@ def trigger_index():
     try:
         # Run simple processing
         result = subprocess.run(
-            ["python", "../process_book.py"],
+            ["python", "/app/process_book.py"],
             capture_output=True,
-            text=True,
-            cwd="."
+            text=True
         )
 
         return {
@@ -37,10 +36,9 @@ def embed_book():
     try:
         # Run embedding to Qdrant
         result = subprocess.run(
-            ["python", "../process_book.py", "embed"],
+            ["python", "/app/process_book.py", "embed"],
             capture_output=True,
-            text=True,
-            cwd="."
+            text=True
         )
 
         return {
@@ -61,7 +59,7 @@ def query_book(query: str = None):
     # Simple keyword matching in markdown files
     try:
         results = []
-        docs_path = "../docs"
+        docs_path = "/app/docs"
 
         for root, dirs, files in os.walk(docs_path):
             for file in files:
