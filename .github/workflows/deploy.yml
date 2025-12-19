@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main, 001-rag-chatbot]
+    branches: [gh-pages]  # Deploy from your current branch
   workflow_dispatch:
 
 permissions:

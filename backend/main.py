@@ -1,12 +1,27 @@
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 import os
 import subprocess
 import json
 from typing import Dict, Any
 
 app = FastAPI(title="Humanoid Robotics Book API", version="1.0.0")
+
+# Add CORS middleware to allow requests from GitHub Pages
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://Akber261986.github.io", "http://localhost:3000", "http://localhost:3001", "http://localhost:8080"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Health check endpoint
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "service": "Humanoid Robotics Book API"}
 
 # Serve the HTML file
 @app.get("/", response_class=HTMLResponse)
