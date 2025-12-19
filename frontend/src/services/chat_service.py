@@ -7,7 +7,7 @@ class ChatService:
     Service class to handle communication with the backend API
     """
 
-    def __init__(self, base_url: str = "http://localhost:8000"):
+    def __init__(self, base_url: str = "humanoidroboticbook-production.up.railway.app"):
         self.base_url = base_url
 
     def create_session(self) -> Dict[str, Any]:
