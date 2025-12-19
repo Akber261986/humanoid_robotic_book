@@ -15,6 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/main.py .
 COPY process_book.py .
 COPY embed_to_qdrant.py .
+COPY frontend_chat.html .
 
 # Copy the docs directory
 COPY docs/ ./docs/

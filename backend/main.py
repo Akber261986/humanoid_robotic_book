@@ -1,4 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
 import os
 import subprocess
 import json
@@ -6,9 +8,18 @@ from typing import Dict, Any
 
 app = FastAPI(title="Humanoid Robotics Book API", version="1.0.0")
 
-@app.get("/")
-def read_root():
-    return {"message": "Humanoid Robotics Book API", "endpoints": ["/trigger-index", "/embed-book", "/query-book"]}
+# Serve the HTML file
+@app.get("/", response_class=HTMLResponse)
+def read_root(request: Request):
+    with open("frontend_chat.html", "r", encoding="utf-8") as file:
+        content = file.read()
+    return HTMLResponse(content=content)
+
+@app.get("/chat")
+def chat_page(request: Request):
+    with open("frontend_chat.html", "r", encoding="utf-8") as file:
+        content = file.read()
+    return HTMLResponse(content=content)
 
 @app.post("/trigger-index")
 def trigger_index():
