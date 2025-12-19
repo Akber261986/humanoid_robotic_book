@@ -1,13 +1,19 @@
-import sys
 import os
-sys.path.insert(0, os.path.abspath('.'))  # Add current directory to path
-sys.path.insert(0, os.path.abspath('..'))  # Add parent directory to path
+import sys
+from dotenv import load_dotenv
 
-# Set environment variables to load from the correct .env file
-os.environ.setdefault('PYTHONPATH', '..')
+# Load environment variables
+load_dotenv()
+
+# Add the backend directory to the path so imports work correctly
+sys.path.insert(0, os.path.abspath('.'))
 
 from src.api.main import app
 import uvicorn
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("PORT", 8000))
+    host = os.getenv("HOST", "0.0.0.0")
+
+    print(f"Starting server on {host}:{port}")
+    uvicorn.run(app, host=host, port=port)
