@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
-import { useBaseUrl } from '@docusaurus/useBaseUrl';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import './FloatingChatWidget.css';
 
 const FloatingChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const chatUrl = useBaseUrl('/chat');
+  const {siteConfig = {}} = useDocusaurusContext();
+  const baseUrl = siteConfig.baseUrl || '/';
+  const chatUrl = `${baseUrl}chat`;
 
   const toggleChat = () => {
     if (!isOpen) {
