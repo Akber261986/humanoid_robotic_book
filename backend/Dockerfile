@@ -21,5 +21,5 @@ COPY docs/ ./docs/
 # Expose port
 EXPOSE 8000
 
-# Run the application
+# Run the application from the correct directory
 CMD ["python", "main.py"]
