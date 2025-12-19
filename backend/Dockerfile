@@ -1,29 +1,27 @@
 FROM python:3.11-slim
 
-# Set working directory
 WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
-    g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first to leverage Docker cache
+# Copy requirements and install dependencies
 COPY backend/requirements.txt .
-
-# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application
-COPY . .
+# Copy application code
+COPY backend/main.py .
+COPY process_book.py .
+COPY embed_to_qdrant.py .
+COPY frontend_chat.html .
+
+# Copy the docs directory
+COPY docs/ ./docs/
 
 # Expose port
-EXPOSE $PORT 8000
+EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
-
-# Run the application
-CMD ["python", "backend/run_server.py"]
+# Run the application from the correct directory
+CMD ["python", "main.py"]

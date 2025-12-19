@@ -1,20 +1,11 @@
-# Railway Configuration for RAG Chatbot Application
-
 [build]
 builder = "dockerfile"
 dockerfilePath = "backend/Dockerfile"
 
 [deploy]
-startCommand = "python run_server.py"
+startCommand = "python main.py"
 restartPolicy = "on-failure"
 restartPolicyMaxRetries = 3
-concurrentBuilds = 1
-healthcheckPath = "/health"
-healthcheckTimeout = 60
 
 [variables]
-PYTHON_ENV = "production"
-PORT = { from = "PORT" }  # Railway provides PORT automatically
-QDRANT_URL = { from = "QDRANT_URL" }  # Set this in Railway dashboard to your Qdrant instance
-GEMINI_API_KEY = { from = "GEMINI_API_KEY" }
-QDRANT_API_KEY = { from = "QDRANT_API_KEY" }  # Optional: if using cloud Qdrant
+PORT = "8000"
