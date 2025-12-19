@@ -211,6 +211,8 @@ See `.specify/memory/constitution.md` for code quality, testing, performance, se
 
 ## Active Technologies
 - N/A (educational content, no application data storage) (001-physical-ai-robotics-book)
+- Python 3.11+ + streamlit, google-generativeai==0.8.3, qdrant-client==1.11.0, markdown==3.7, python-dotenv (001-rag-chatbot)
+- Qdrant vector database (local) (001-rag-chatbot)
 
 ## Recent Changes
 - 001-physical-ai-robotics-book: Added N/A (educational content, no application data storage)

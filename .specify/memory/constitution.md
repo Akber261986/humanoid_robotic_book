@@ -1,18 +1,12 @@
 <!--
 Sync Impact Report:
-Version change: 0.0.0 → 1.0.0 (MAJOR: Initial constitution creation)
+Version change: 1.1.0 → 1.2.0 (MINOR: Add directory structure requirement)
 Modified principles:
-- [PRINCIPLE_1_NAME] → Accuracy
-- [PRINCIPLE_2_NAME] → Clarity
-- [PRINCIPLE_3_NAME] → Reproducibility
-- [PRINCIPLE_4_NAME] → Rigor
-- [PRINCIPLE_5_NAME] → Key Standards
+- Added directory structure constraint
 Added sections:
-- Constraints
-- Success Criteria
+- Directory organization requirement
 Removed sections:
-- [PRINCIPLE_6_NAME]
-- [PRINCIPLE__DESCRIPTION]
+- None
 Templates requiring updates:
 - .specify/templates/plan-template.md: ⚠ pending
 - .specify/templates/spec-template.md: ⚠ pending
@@ -29,47 +23,47 @@ Templates requiring updates:
 - .claude/commands/sp.specify.md: ✅ updated
 - .claude/commands/sp.tasks.md: ✅ updated
 Follow-up TODOs:
-- TODO(RATIFICATION_DATE): Original adoption date unknown, mark as TODO.
+- None
 -->
-# Educational book on Physical AI & Humanoid Robotics Constitution
+# Humanoid Robotics Book RAG Chatbot Constitution
 
 ## Core Principles
 
-### I. Accuracy
-Accuracy through verification against established robotics frameworks and tools (e.g., ROS 2, Gazebo, NVIDIA Isaac).
+### I. User-Centric Focus
+Deliver accurate, context-aware responses to user queries about humanoid robotics, drawing directly from book content to enhance learning and hackathon preparation.
 
-### II. Clarity
-Clarity for student audience (computer science or engineering background, assuming introductory AI knowledge).
+### II. Transparency & Reliability
+Use Retrieval-Augmented Generation (RAG) to ground responses in verifiable book sources, reducing hallucinations. Always cite retrieved sections.
 
-### III. Reproducibility
-Reproducibility (all code examples, simulations, and hardware setups must be executable and traceable).
+### III. Privacy & Security
+Handle no user data beyond queries; use local Qdrant for vector storage to avoid cloud dependencies unless specified.
 
-### IV. Rigor
-Rigor (prefer official documentation, tutorials, and industry-standard practices).
+### IV. Extensibility
+Modular design allowing easy updates to book content, embedding models, or UI. Inspired by simple Gemini bots (e.g., chatkit-gemini-bot), but enhanced with RAG for depth.
 
-### V. Key Standards
-- All technical claims must be traceable to sources (e.g., official ROS docs, NVIDIA developer resources)
-- Citation format: Markdown links or inline references to URLs/docs
-- Source types: minimum 50% official documentation and open-source repositories
-- Plagiarism check: 0% tolerance; all content must be original synthesis
-- Writing clarity: Flesch-Kincaid grade 8-10 for accessibility
+### V. Tech Stack Constraints
+Python-based (Streamlit for UI, Google Generative AI for Gemini integration).
 
 ## Constraints
 
-- Word count: Flexible per chapter, total book 10,000-20,000 words
-- Minimum 10 sources per module (e.g., docs, papers, repos)
-- Format: Markdown files for Docusaurus compatibility, with code blocks in Python/ROS syntax
+- All responses must be grounded in book content with proper citations
+- No user data storage beyond immediate query processing
+- Local vector storage (Qdrant) for privacy compliance
+- Python-first approach for all components (backend, processing, UI)
+- Modular architecture allowing component replacement without system rewrite
+- Directory structure: Separate 'frontend' and 'backend' directories to enable independent tracking and development of each component
 
 ## Success Criteria
 
-- All claims verified against sources and tools
-- Zero plagiarism detected
-- Passes technical review for reproducibility (e.g., simulations run without errors)
-- Content deployable to GitHub Pages via SpeckitPlus and Cloud Code without issues
+- Zero hallucinations in responses (all answers backed by book content)
+- Fast response times (sub-3 second latency for typical queries)
+- Accurate citation of source material with page/section references
+- Secure handling of all user queries without data persistence
+- Scalable architecture supporting concurrent users during hackathon events
 
 ## Governance
 
 Constitution supersedes all other practices; Amendments require documentation, approval, migration plan.
-All PRs/reviews must verify compliance; Complexity must be justified; Use CLAUDE.md for runtime development guidance.
+All PRs/reviews must verify compliance with RAG principles; Complexity must be justified; Use CLAUDE.md for runtime development guidance.
 
-**Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE): Original adoption date unknown | **Last Amended**: 2025-12-07
+**Version**: 1.2.0 | **Ratified**: 2025-12-11 | **Last Amended**: 2025-12-11

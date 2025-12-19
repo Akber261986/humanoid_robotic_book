@@ -33,13 +33,15 @@ The book has been enhanced with an AI-powered assistant that allows users to:
 - Get explanations for selected text on any page
 - Interact with a dedicated chat interface
 - Access AI-powered search across all book modules
+- Maintain persistent chat sessions with context
 
 ### Technology Stack for RAG Feature:
-- **Vector Database**: Qdrant (cloud tier)
+- **Vector Database**: Qdrant (local/cloud)
 - **Embedding Model**: Google Gemini (embedding-001)
-- **AI Model**: Google Gemini (flash-2.5)
+- **AI Model**: Google Gemini (gemini-1.5-flash)
 - **Backend Framework**: FastAPI with Google Generative AI
-- **Chat Interface**: Custom React component with Docusaurus integration
+- **Frontend Interface**: Streamlit chat application
+- **Architecture**: Separated frontend and backend services
 
 ## Structure
 
@@ -51,8 +53,18 @@ The book has been enhanced with an AI-powered assistant that allows users to:
   - `examples/` - Reproducible code examples for each module
 
 - `backend/` - Contains the RAG backend system
-  - `api/` - FastAPI application
-  - `scripts/` - Ingestion and utility scripts
+  - `src/` - Source code for the backend services
+    - `api/` - FastAPI application with REST API endpoints
+    - `models/` - Pydantic data models
+    - `services/` - Core services (RAG, indexing, vector store, etc.)
+    - `utils/` - Utility functions (chunking, parsing, etc.)
+  - `requirements.txt` - Python dependencies
+  - `Dockerfile` - Container configuration
+
+- `frontend/` - Contains the Streamlit chat interface
+  - `src/` - Source code for the frontend services
+    - `services/` - API communication services
+  - `app.py` - Main Streamlit application
   - `requirements.txt` - Python dependencies
   - `Dockerfile` - Container configuration
 
@@ -63,7 +75,90 @@ The book has been enhanced with an AI-powered assistant that allows users to:
 
 ## Quick Start
 
-For a quick introduction to the concepts covered in this book, see the `quickstart.md` file in the specs directory which provides step-by-step setup instructions and foundational examples.
+Follow these steps to set up and run the RAG-enabled chatbot for the Humanoid Robotics Book:
+
+### Prerequisites
+- Python 3.11+
+- Docker (optional, for containerized deployment)
+- Google Gemini API key
+- Qdrant vector database (local or cloud)
+
+### Setup Instructions
+
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd humanoid_robotic_book
+   ```
+
+2. **Set up the backend**:
+   ```bash
+   cd backend
+   pip install -r requirements.txt
+   ```
+
+3. **Configure environment variables**:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your Gemini API key and Qdrant configuration
+   ```
+
+4. **Start Qdrant vector database** (if using local):
+   ```bash
+   docker run -d --name qdrant-container -p 6333:6333 qdrant/qdrant
+   ```
+
+5. **Index the book content**:
+   ```bash
+   # From the backend directory
+   python -c "
+   from backend.src.services.indexer import Indexer
+   indexer = Indexer()
+   result = indexer.index_directory('../../docs')
+   print('Indexing result:', result)
+   "
+   ```
+
+6. **Start the backend API server**:
+   ```bash
+   # From the backend directory
+   uvicorn backend.src.api.main:app --reload --host 0.0.0.0 --port 8000
+   ```
+
+7. **Set up the frontend** (in a new terminal):
+   ```bash
+   cd frontend  # Navigate to the frontend directory
+   pip install -r requirements.txt
+   ```
+
+8. **Start the frontend Streamlit app**:
+   ```bash
+   # From the frontend directory
+   streamlit run app.py
+   ```
+
+9. **Access the chatbot**:
+   - Backend API: `http://localhost:8000`
+   - Frontend UI: `http://localhost:8501`
+   - API documentation: `http://localhost:8000/docs`
+
+### Docker Deployment
+
+To run both services using Docker:
+
+1. **Build and run the backend**:
+   ```bash
+   cd backend
+   docker build -t humanoid-robotics-backend .
+   docker run -d -p 8000:8000 --env-file .env humanoid-robotics-backend
+   ```
+
+2. **Build and run the frontend**:
+   ```bash
+   cd frontend
+   docker build -t humanoid-robotics-frontend .
+   docker run -d -p 8501:8501 --env-file .env humanoid-robotics-frontend
+   ```
 
 ## Target Audience
 
@@ -87,18 +182,7 @@ Upon completing this book, readers will be able to:
 
 ## Local Development
 
-### Frontend Setup
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Start the development server:
-   ```bash
-   npm start
-   ```
-
-### Backend Setup (for RAG features)
+### Backend Setup
 1. Navigate to the backend directory:
    ```bash
    cd backend
@@ -115,38 +199,82 @@ Upon completing this book, readers will be able to:
    # Edit .env with your API keys and configuration
    ```
 
-4. Run the ingestion script to populate the vector database:
+4. Index the book content into the vector database:
    ```bash
-   python scripts/ingest_docs.py
+   # From the backend directory
+   python -c "
+   from backend.src.services.indexer import Indexer
+   indexer = Indexer()
+   result = indexer.index_directory('../docs')  # Adjust path as needed
+   print('Indexing result:', result)
+   "
    ```
 
 5. Start the backend server:
    ```bash
-   uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+   # From the backend directory
+   uvicorn backend.src.api.main:app --reload --host 0.0.0.0 --port 8000
+   ```
+
+### Frontend Setup
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+
+2. Install Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Start the Streamlit frontend:
+   ```bash
+   # From the frontend directory
+   streamlit run app.py
    ```
 
 ## Deployment
 
-This book is built with [Docusaurus](https://docusaurus.io/) and is configured for GitHub Pages deployment. The RAG backend can be deployed separately to platforms like Vercel, Railway, or any container-compatible platform.
+This book is built with [Docusaurus](https://docusaurus.io/) and is configured for GitHub Pages deployment. The RAG backend and Streamlit frontend are deployed as separate services to platforms like Railway, Heroku, or any container-compatible platform.
 
 ### GitHub Pages Deployment
 
-The site is configured to deploy automatically via GitHub Actions when changes are pushed to the main branch. The GitHub Actions workflow is defined in `.github/workflows/deploy.yml`.
+The book content is configured to deploy automatically via GitHub Actions when changes are pushed to the main branch. The GitHub Actions workflow is defined in `.github/workflows/deploy.yml`.
 
 To manually deploy, you can run:
 ```bash
-GIT_USER=Akber261986 CURRENT_BRANCH=main npm run deploy
+GIT_USER=<your-username> CURRENT_BRANCH=main npm run deploy
 ```
 
-The site will be deployed to: https://Akber261986.github.io/humanoid_robotic_book/
+The site will be deployed to: https://<your-username>.github.io/humanoid_robotic_book/
 
-### Backend Deployment
+### Backend and Frontend Deployment
 
-Use the provided Dockerfile and docker-compose.yml for easy deployment to container orchestration platforms:
+The RAG-enabled chatbot consists of two separate services:
+
+1. **Backend API Service**: Deploy the backend using the provided Dockerfile to platforms like Railway, Heroku, or AWS:
+   ```bash
+   # Build and push the backend container
+   cd backend
+   docker build -t humanoid-robotics-backend .
+   docker push <your-registry>/humanoid-robotics-backend
+   ```
+
+2. **Frontend Streamlit Service**: Deploy the frontend using the provided Dockerfile:
+   ```bash
+   # Build and push the frontend container
+   cd frontend
+   docker build -t humanoid-robotics-frontend .
+   docker push <your-registry>/humanoid-robotics-frontend
+   ```
+
+### Docker Compose Deployment
+
+Use the docker-compose.yml for easy local deployment of both services:
 
 ```bash
-# Build and deploy with docker-compose
-docker-compose up -d
+# Build and deploy both services with docker-compose
+docker-compose up --build -d
 ```
 
 ## Contributing
