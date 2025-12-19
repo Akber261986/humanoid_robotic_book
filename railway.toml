@@ -5,7 +5,7 @@ builder = "dockerfile"
 dockerfilePath = "backend/Dockerfile"
 
 [deploy]
-startCommand = "python -m backend.src.api.main"
+startCommand = "cd backend && python run_server.py"
 restartPolicy = "on-failure"
 restartPolicyMaxRetries = 3
 concurrentBuilds = 1
@@ -15,6 +15,5 @@ healthcheckTimeout = 60
 [variables]
 PYTHON_ENV = "production"
 PORT = "8000"
-QDRANT_HOST = "localhost"
-QDRANT_PORT = "6333"
+QDRANT_URL = { from = "QDRANT_URL" }  # Set this in Railway dashboard to your Qdrant instance
 GEMINI_API_KEY = { from = "GEMINI_API_KEY" }
