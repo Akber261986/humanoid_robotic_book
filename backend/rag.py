@@ -17,7 +17,7 @@ load_dotenv()
 # Configuration
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "")
-QDRANT_COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", "humanoid_robotics_docs")
+QDRANT_COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", "book_vectors")  # Updated to match status
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_EMBEDDING_MODEL = os.getenv("GEMINI_EMBEDDING_MODEL", "embedding-001")
 GEMINI_GENERATION_MODEL = os.getenv("GEMINI_GENERATION_MODEL", "gemini-1.5-flash")
@@ -50,14 +50,36 @@ def initialize_services():
 def embed_query(query: str) -> List[float]:
     """Generate embedding for a query using Gemini"""
     try:
+        # Validate the query is not empty
+        if not query or not query.strip():
+            logger.error("Empty query provided for embedding")
+            return []
+
+        # Ensure query is not too long (Gemini has limits)
+        query = query.strip()[:1000]  # Limit to 1000 characters
+
         response = genai.embed_content(
             model=GEMINI_EMBEDDING_MODEL,
             content=[query],
             task_type="retrieval_query"
         )
-        return response['embedding'][0]
+
+        if 'embedding' not in response or not response['embedding']:
+            logger.error(f"No embedding returned for query: {query[:50]}...")
+            return []
+
+        embedding = response['embedding'][0]
+
+        if not embedding or len(embedding) == 0:
+            logger.error(f"Empty embedding returned for query: {query[:50]}...")
+            return []
+
+        return embedding
     except Exception as e:
-        logger.error(f"Error generating embedding for query '{query}': {e}")
+        logger.error(f"Error generating embedding for query '{query[:50]}...': {e}")
+        # Log more details about the exception
+        import traceback
+        logger.error(f"Full traceback: {traceback.format_exc()}")
         return []
 
 def retrieve_from_qdrant(query_embedding: List[float], top_k: int = 3) -> List[Dict[str, Any]]:
@@ -159,7 +181,16 @@ def generate_response(prompt: str) -> str:
 def query_rag_pipeline(query: str) -> Dict[str, Any]:
     """Complete RAG pipeline: embed query, retrieve, augment, and generate"""
     try:
+        # Validate query input
+        if not query or not query.strip():
+            return {
+                "response": "Please provide a valid question to answer.",
+                "sources": [],
+                "query": query
+            }
+
         # Truncate very long queries (max 1000 characters as per spec)
+        original_query = query
         if len(query) > 1000:
             logger.info(f"Truncating query from {len(query)} to 1000 characters")
             query = query[:1000]
@@ -167,14 +198,18 @@ def query_rag_pipeline(query: str) -> Dict[str, Any]:
         # Step 1: Embed the query
         query_embedding = embed_query(query)
         if not query_embedding:
+            logger.error(f"Failed to generate embedding for query: {query[:100]}...")
             return {
-                "response": "Error: Could not generate embedding for the query. Please try again with a different question.",
+                "response": "Error: Could not generate embedding for the query. This might be due to an issue with the AI service or an invalid query. Please try again with a different question.",
                 "sources": [],
-                "query": query
+                "query": original_query
             }
+
+        logger.info(f"Successfully generated embedding of length {len(query_embedding)} for query: {query[:50]}...")
 
         # Step 2: Retrieve from Qdrant
         retrieved_docs = retrieve_from_qdrant(query_embedding)
+        logger.info(f"Retrieved {len(retrieved_docs)} documents from Qdrant")
 
         # Step 3: Augment prompt with retrieved documents
         augmented_prompt = augment_prompt(query, retrieved_docs)
@@ -198,11 +233,13 @@ def query_rag_pipeline(query: str) -> Dict[str, Any]:
         return {
             "response": response,
             "sources": sources,
-            "query": query,
+            "query": original_query,
             "retrieved_docs_count": len(retrieved_docs)
         }
     except Exception as e:
         logger.error(f"Error in RAG pipeline: {e}")
+        import traceback
+        logger.error(f"Full traceback: {traceback.format_exc()}")
         return {
             "response": f"An error occurred during processing: {str(e)}",
             "sources": [],
