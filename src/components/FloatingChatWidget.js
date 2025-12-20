@@ -113,11 +113,66 @@ const FloatingChatWidget = () => {
       setMessages(prev => [...prev, botResponse]);
     } catch (error) {
       console.error('Error sending message:', error);
-      // Check if it's a CORS or network error
+      // Check for specific error types
       if (error.message.includes('CORS') || error.message.includes('network')) {
         const errorMessage = {
           id: Date.now() + 1,
           text: `Network error: Unable to connect to the backend. The API might not be available or CORS might not be configured properly.`,
+          sender: 'bot',
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, errorMessage]);
+      } else if (error.message.includes('404') || error.message.includes('405')) {
+        // If the /api/query-book endpoint doesn't exist, try the legacy endpoint
+        try {
+          const fallbackEndpoint = `https://humanoidroboticbook-production.up.railway.app/query-book?query=${encodeURIComponent(inputValue)}`;
+          console.log('Trying fallback endpoint:', fallbackEndpoint);
+
+          const fallbackResponse = await fetch(fallbackEndpoint, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+
+          if (fallbackResponse.ok) {
+            const fallbackData = await fallbackResponse.json();
+            let fallbackBotResponse;
+            if (fallbackData.error) {
+              fallbackBotResponse = {
+                id: Date.now() + 1,
+                text: `Error: ${fallbackData.error}. Please try rephrasing your question.`,
+                sender: 'bot',
+                timestamp: new Date()
+              };
+            } else if (fallbackData.results && fallbackData.results.length > 0) {
+              const responseText = `I found some relevant information:\n\n${fallbackData.results.slice(0, 2).map(r => r.context).join('\n\n')}`;
+              fallbackBotResponse = {
+                id: Date.now() + 1,
+                text: responseText,
+                sender: 'bot',
+                timestamp: new Date(),
+                sources: fallbackData.results
+              };
+            } else {
+              fallbackBotResponse = {
+                id: Date.now() + 1,
+                text: "I couldn't find specific information about your query in the book content. Please try rephrasing your question or ask about humanoid robotics fundamentals.",
+                sender: 'bot',
+                timestamp: new Date()
+              };
+            }
+            setMessages(prev => [...prev, fallbackBotResponse]);
+            return; // Exit after handling fallback
+          }
+        } catch (fallbackError) {
+          console.error('Fallback also failed:', fallbackError);
+        }
+
+        // If fallback also fails, send the original error message
+        const errorMessage = {
+          id: Date.now() + 1,
+          text: `Sorry, I encountered an error processing your request: ${error.message}. Please try again.`,
           sender: 'bot',
           timestamp: new Date()
         };

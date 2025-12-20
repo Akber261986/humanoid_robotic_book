@@ -8,6 +8,11 @@ import json
 from typing import Dict, Any
 
 # Import the RAG module
+import sys
+import os
+# Add the backend directory to Python path to ensure rag module can be imported
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from rag import query_rag_pipeline, check_services
 
 app = FastAPI(title="Humanoid Robotics Book API", version="1.0.0")
