@@ -7,15 +7,15 @@
 
 /* You can override the default Docusaurus styling here. */
 
-/* Custom color theme - restoring magenta/purple primary color */
+/* Custom color theme - using #02c8fa as primary color */
 :root {
-  --ifm-color-primary: #d63384; /* Magenta color */
-  --ifm-color-primary-dark: #c22a75;
-  --ifm-color-primary-darker: #b5276e;
-  --ifm-color-primary-darkest: #99215e;
-  --ifm-color-primary-light: #da4a91;
-  --ifm-color-primary-lighter: #dd589a;
-  --ifm-color-primary-lightest: #e680af;
+  --ifm-color-primary: #02c8fa; /* New primary blue color */
+  --ifm-color-primary-dark: #02a2c9;
+  --ifm-color-primary-darker: #018fb0;
+  --ifm-color-primary-darkest: #01728d;
+  --ifm-color-primary-light: #1ad0ff;
+  --ifm-color-primary-lighter: #33d6ff;
+  --ifm-color-primary-lightest: #66e0ff;
 }
 
 /* Additional styling for better appearance */
@@ -23,9 +23,9 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Style for selected text if needed */
+/* Style for selected text */
 ::selection {
-  background-color: #d63384;
+  background-color: #02c8fa;
   color: white;
 }
 
@@ -38,4 +38,51 @@ html {
 .button--primary:hover {
   background-color: var(--ifm-color-primary-dark);
   border-color: var(--ifm-color-primary-dark);
+}
+
+/* Link styling with new primary color */
+a {
+  color: var(--ifm-color-primary);
+}
+
+a:hover {
+  color: var(--ifm-color-primary-dark);
+}
+
+/* Navigation styling */
+.navbar {
+  background-color: var(--ifm-color-primary);
+}
+
+.navbar__link:hover {
+  color: var(--ifm-color-primary-light);
+}
+
+/* Sidebar styling */
+.menu__list-item a:hover {
+  color: var(--ifm-color-primary);
+}
+
+/* Code block styling */
+.docusaurus-highlight-code-line {
+  background-color: rgba(2, 200, 250, 0.1);
+}
+
+/* Table styling */
+table {
+  border-color: var(--ifm-color-primary-lighter);
+}
+
+table th {
+  background-color: rgba(2, 200, 250, 0.1);
+}
+
+/* Blockquote styling */
+blockquote {
+  border-left-color: var(--ifm-color-primary);
+}
+
+/* Footer styling */
+.footer--dark {
+  --ifm-footer-background-color: var(--ifm-color-primary-darkest);
 }

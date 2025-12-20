@@ -381,13 +381,8 @@
   }
 }
 
-/* Docusaurus theme variables compatibility */
-:root {
-  --ifm-color-primary: #d63384; /* Magenta color from custom.css */
-  --ifm-color-primary-dark: #c22a75;
-  --ifm-color-primary-darker: #b5276e;
-  --ifm-color-primary-darkest: #99215e;
-  --ifm-color-primary-light: #da4a91;
-  --ifm-color-primary-lighter: #dd589a;
-  --ifm-color-primary-lightest: #e680af;
+/* Focus input field with new primary color */
+.chat-input:focus {
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 0 3px rgba(2, 200, 250, 0.1);
 }

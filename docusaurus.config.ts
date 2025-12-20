@@ -102,7 +102,7 @@ const config: Config = {
               },
               {
                 label: 'Discord',
-                href: 'https://discordapp.com/invite/docusaurus',
+                href: 'https://discordapp.com/ignite/docusaurus',
               },
             ],
           },
@@ -123,7 +123,15 @@ const config: Config = {
         darkTheme: prismThemes.dracula,
         additionalLanguages: ['python', 'bash', 'json', 'yaml'],
       },
+      colorMode: {
+        defaultMode: 'light',
+        disableSwitch: false,
+        respectPrefersColorScheme: true,
+      },
     } satisfies Preset.ThemeConfig,
+  themes: [
+    // ... your other themes
+  ],
 };
 
 export default config;

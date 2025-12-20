@@ -277,6 +277,47 @@ Use the docker-compose.yml for easy local deployment of both services:
 docker-compose up --build -d
 ```
 
+## Testing the Complete Functionality
+
+To test the complete RAG chatbot functionality after setup:
+
+### Manual Testing
+
+1. **Start the backend server**:
+   ```bash
+   cd backend
+   uvicorn main:app --reload --host 0.0.0.0 --port 8000
+   ```
+
+2. **In a separate terminal, run the test script**:
+   ```bash
+   python test_rag_chatbot.py
+   ```
+
+3. **Manual API testing**:
+   - Visit `http://localhost:8000/docs` for interactive API documentation
+   - Test the `/api/query-book` endpoint with sample queries
+   - Check service status at `http://localhost:8000/status`
+
+### End-to-End Testing
+
+1. **Verify Qdrant integration**:
+   ```bash
+   # Check if your book content has been indexed
+   curl "http://localhost:6333/collections"
+   ```
+
+2. **Test query functionality**:
+   ```bash
+   curl "http://localhost:8000/api/query-book?query=What%20is%20humanoid%20robotics"
+   ```
+
+3. **Test the floating chat widget**:
+   - Start the Docusaurus site: `npm run start`
+   - Open the book in your browser
+   - Click the floating chat widget
+   - Ask questions about the book content
+
 ## Contributing
 
 1. Fork the repository

@@ -7,12 +7,15 @@ import subprocess
 import json
 from typing import Dict, Any
 
+# Import the RAG module
+from rag import query_rag_pipeline, check_services
+
 app = FastAPI(title="Humanoid Robotics Book API", version="1.0.0")
 
 # Add CORS middleware to allow requests from GitHub Pages
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://Akber261986.github.io", "http://localhost:3000", "http://localhost:3001", "http://localhost:8080"],
+    allow_origins=["https://Akber261986.github.io", "http://localhost:3000", "http://localhost:3001", "http://localhost:8080", "http://localhost:3002"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -22,6 +25,11 @@ app.add_middleware(
 @app.get("/health")
 def health_check():
     return {"status": "healthy", "service": "Humanoid Robotics Book API"}
+
+# Service status check
+@app.get("/status")
+def service_status():
+    return check_services()
 
 # Serve the HTML file
 @app.get("/", response_class=HTMLResponse)
@@ -76,49 +84,30 @@ def embed_book():
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-@app.get("/query-book")
-def query_book(query: str = None):
-    """Query about the book content"""
+@app.get("/api/query-book")
+def query_book_api(query: str = None):
+    """Query about the book content using RAG pipeline"""
     if not query:
         return {"error": "Please provide a query parameter"}
 
-    # Simple keyword matching in markdown files
     try:
-        results = []
-        docs_path = "/app/docs"
+        # Use the RAG pipeline to get response from LLM with Qdrant integration
+        result = query_rag_pipeline(query)
+        return result
+    except Exception as e:
+        return {"error": str(e)}
 
-        for root, dirs, files in os.walk(docs_path):
-            for file in files:
-                if file.endswith('.md'):
-                    file_path = os.path.join(root, file)
-                    with open(file_path, 'r', encoding='utf-8') as f:
-                        content = f.read()
+# Keep the old query-book endpoint for backward compatibility
+@app.get("/query-book")
+def query_book(query: str = None):
+    """Query about the book content (legacy endpoint)"""
+    if not query:
+        return {"error": "Please provide a query parameter"}
 
-                        # Simple search - look for query in content
-                        if query.lower() in content.lower():
-                            # Extract context around the query
-                            lines = content.split('\n')
-                            matching_lines = []
-
-                            for i, line in enumerate(lines):
-                                if query.lower() in line.lower():
-                                    # Get context: previous line, matching line, next line
-                                    start = max(0, i-1)
-                                    end = min(len(lines), i+2)
-                                    context = '\n'.join(lines[start:end])
-                                    matching_lines.append({
-                                        "file": file,
-                                        "context": context
-                                    })
-
-                            if matching_lines:
-                                results.extend(matching_lines)
-
-        return {
-            "query": query,
-            "results": results[:5],  # Limit to first 5 results
-            "total_matches": len(results)
-        }
+    try:
+        # Use the RAG pipeline to get response from LLM with Qdrant integration
+        result = query_rag_pipeline(query)
+        return result
     except Exception as e:
         return {"error": str(e)}
 
