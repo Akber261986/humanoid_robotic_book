@@ -32,12 +32,15 @@ def initialize_services():
         # Initialize Qdrant client
         if QDRANT_API_KEY:
             qdrant_client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
+            logger.info(f"Qdrant client initialized with API key, connecting to {QDRANT_URL}")
         else:
             qdrant_client = QdrantClient(url=QDRANT_URL)
+            logger.info(f"Qdrant client initialized without API key, connecting to {QDRANT_URL}")
 
         # Initialize Gemini
         if GEMINI_API_KEY:
             genai.configure(api_key=GEMINI_API_KEY)
+            logger.info("Gemini API configured successfully")
         else:
             logger.error("GEMINI_API_KEY not found in environment variables")
             return None, None
@@ -45,6 +48,8 @@ def initialize_services():
         return qdrant_client, genai
     except Exception as e:
         logger.error(f"Error initializing services: {e}")
+        import traceback
+        logger.error(f"Full traceback: {traceback.format_exc()}")
         return None, None
 
 def embed_query(query: str) -> List[float]:
@@ -58,14 +63,20 @@ def embed_query(query: str) -> List[float]:
         # Ensure query is not too long (Gemini has limits)
         query = query.strip()[:1000]  # Limit to 1000 characters
 
+        logger.info(f"Attempting to generate embedding for query: {query[:50]}...")
+        logger.info(f"Using model: {GEMINI_EMBEDDING_MODEL}")
+
         response = genai.embed_content(
             model=GEMINI_EMBEDDING_MODEL,
             content=[query],
             task_type="retrieval_query"
         )
 
+        logger.info(f"Embedding API response received. Type: {type(response)}")
+
         if 'embedding' not in response or not response['embedding']:
             logger.error(f"No embedding returned for query: {query[:50]}...")
+            logger.error(f"Full response: {response}")
             return []
 
         embedding = response['embedding'][0]
@@ -74,6 +85,7 @@ def embed_query(query: str) -> List[float]:
             logger.error(f"Empty embedding returned for query: {query[:50]}...")
             return []
 
+        logger.info(f"Successfully generated embedding of length {len(embedding)}")
         return embedding
     except Exception as e:
         logger.error(f"Error generating embedding for query '{query[:50]}...': {e}")
