@@ -55,7 +55,7 @@ def trigger_index():
     try:
         # Run simple processing
         result = subprocess.run(
-            ["python", "/app/process_book.py"],
+            ["python", "./process_book.py"],
             capture_output=True,
             text=True
         )
@@ -75,7 +75,7 @@ def embed_book():
     try:
         # Run embedding to Qdrant
         result = subprocess.run(
-            ["python", "/app/process_book.py", "embed"],
+            ["python", "./process_book.py", "embed"],
             capture_output=True,
             text=True
         )
