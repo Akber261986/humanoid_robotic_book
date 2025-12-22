@@ -14,9 +14,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY backend/main.py .
 COPY backend/rag_simple.py .
-COPY process_book.py .
-COPY embed_to_qdrant.py .
 COPY frontend_chat.html .
+COPY tfidf_vectorizer.pkl .
+COPY .env .
 
 # Copy the docs directory
 COPY docs/ ./docs/
