@@ -205,14 +205,30 @@ def embed_query_with_tfidf(query: str) -> List[float]:
 
         # Load the saved TF-IDF vectorizer
         try:
-            # Try absolute path from project root
-            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            vectorizer_path = os.path.join(project_root, "tfidf_vectorizer.pkl")
-            with open(vectorizer_path, 'rb') as f:
-                vectorizer = pickle.load(f)
+            # Try multiple possible locations for the vectorizer file
+            possible_paths = [
+                "tfidf_vectorizer.pkl",  # Same directory as script (for Docker deployment)
+                os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tfidf_vectorizer.pkl"),  # Project root
+                os.path.join(os.path.dirname(__file__), "tfidf_vectorizer.pkl"),  # Same directory as script (alternative)
+            ]
+
+            vectorizer = None
+            vectorizer_path = None
+
+            for path in possible_paths:
+                if os.path.exists(path):
+                    vectorizer_path = path
+                    with open(path, 'rb') as f:
+                        vectorizer = pickle.load(f)
+                    break
+
+            if vectorizer is None:
+                logger.error("TF-IDF vectorizer not found in any expected location.")
+                return []
+
             logger.info(f"Loaded TF-IDF vectorizer from {vectorizer_path}")
-        except FileNotFoundError:
-            logger.error("TF-IDF vectorizer not found. Run embedding script first.")
+        except Exception as e:
+            logger.error(f"Error loading TF-IDF vectorizer: {e}")
             return []
 
         # Transform the query using the fitted vectorizer
@@ -407,15 +423,23 @@ def check_services():
     """Check if required services are available"""
     try:
         # Check if TF-IDF vectorizer is available
+        tfidf_ok = False
         try:
-            # Try absolute path from project root
-            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            vectorizer_path = os.path.join(project_root, "tfidf_vectorizer.pkl")
-            with open(vectorizer_path, 'rb') as f:
-                import pickle
-                vectorizer = pickle.load(f)
-            tfidf_ok = True
-        except FileNotFoundError:
+            # Try multiple possible locations for the vectorizer file
+            possible_paths = [
+                "tfidf_vectorizer.pkl",  # Same directory as script (for Docker deployment)
+                os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tfidf_vectorizer.pkl"),  # Project root
+                os.path.join(os.path.dirname(__file__), "tfidf_vectorizer.pkl"),  # Same directory as script (alternative)
+            ]
+
+            for path in possible_paths:
+                if os.path.exists(path):
+                    with open(path, 'rb') as f:
+                        import pickle
+                        vectorizer = pickle.load(f)
+                    tfidf_ok = True
+                    break
+        except Exception:
             tfidf_ok = False
 
         return {
