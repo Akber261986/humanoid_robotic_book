@@ -18,10 +18,10 @@ from rag_simple_fixed import query_rag_pipeline, check_services
 
 app = FastAPI(title="Humanoid Robotics Book API", version="1.0.0")
 
-# Add CORS middleware to allow requests from GitHub Pages
+# Add CORS middleware to allow requests from any origin
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://Akber261986.github.io", "http://localhost:3000", "http://localhost:3001", "http://localhost:8080", "http://localhost:3002"],
+    allow_origins=["*"],  # Allow all origins for the chatbot to work from any frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
