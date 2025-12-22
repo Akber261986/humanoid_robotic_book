@@ -68,18 +68,28 @@ def embed_query_with_tfidf(query: str) -> List[float]:
 
             for path in possible_paths:
                 if os.path.exists(path):
-                    vectorizer_path = path
-                    with open(path, 'rb') as f:
-                        vectorizer = pickle.load(f)
-                    break
+                    try:
+                        with open(path, 'rb') as f:
+                            # Try to load the vectorizer with error handling for compatibility issues
+                            import pickle
+                            import sys
+                            # Set pickle protocol to handle compatibility issues
+                            vectorizer = pickle.load(f)
+                        vectorizer_path = path
+                        break
+                    except Exception as load_error:
+                        logger.warning(f"Failed to load vectorizer from {path}: {load_error}")
+                        continue
 
             if vectorizer is None:
-                logger.error("TF-IDF vectorizer not found in any expected location.")
+                logger.error("TF-IDF vectorizer not found or could not be loaded from any expected location.")
                 return []
 
             logger.info(f"Loaded TF-IDF vectorizer from {vectorizer_path}")
         except Exception as e:
             logger.error(f"Error loading TF-IDF vectorizer: {e}")
+            import traceback
+            logger.error(f"Full traceback: {traceback.format_exc()}")
             return []
 
         # Transform the query using the fitted vectorizer
