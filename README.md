@@ -277,6 +277,68 @@ Use the docker-compose.yml for easy local deployment of both services:
 docker-compose up --build -d
 ```
 
+## Running the Book Embedding Process
+
+To embed the book content to Qdrant and make it searchable:
+
+1. **Prerequisites**:
+   - Install Docker Desktop from https://www.docker.com/products/docker-desktop
+   - Get a Google Gemini API key from https://aistudio.google.com/
+   - Update your `.env` file with your Gemini API key
+   - Ensure you have sufficient quota for embedding requests (free tier has limits)
+
+2. **Start Qdrant**:
+   ```bash
+   docker run -d --name qdrant-container -p 6333:6333 qdrant/qdrant
+   ```
+
+3. **Run the embedding process**:
+   ```bash
+   # Method 1: Using the helper script
+   python run_app_and_embed.py
+
+   # Method 2: Manually via API
+   # Start the backend server
+   cd backend
+   python -m uvicorn main:app --host 0.0.0.0 --port 8000
+
+   # Then trigger the embedding via API
+   curl -X POST http://localhost:8000/embed-book
+   ```
+
+4. **Test the functionality**:
+   ```bash
+   # Query the embedded content
+   curl "http://localhost:8000/api/query-book?query=inverse%20kinematics"
+   ```
+
+### Troubleshooting Common Issues
+
+- **API Quota Exceeded**: If you see "429 Quota exceeded" errors during embedding, you've reached the free tier limits for the Gemini API. You may need to:
+  - Wait until your daily/monthly quota resets
+  - Upgrade to a paid plan at https://aistudio.google.com/
+  - Check your usage at https://ai.dev/usage?tab=rate-limit
+  - **Alternative**: Use local embedding methods (see below)
+
+- **API Key Not Recognized**: If you see "API key not valid" errors, ensure:
+  - Your API key is correctly set in the `.env` file
+  - You don't have conflicting system environment variables
+  - Your API key has the necessary permissions for embedding
+
+- **PyTorch DLL Issues on Windows**: If you encounter DLL initialization errors with local embeddings:
+  - Try installing CPU-only PyTorch: `pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu`
+  - Or use the TF-IDF fallback method
+
+### Alternative Embedding Methods
+
+The system supports multiple embedding approaches:
+
+1. **Gemini API (Default)**: High-quality semantic embeddings but requires API key and quota
+2. **Sentence Transformers (Local)**: Good quality embeddings without API dependency, requires PyTorch
+3. **TF-IDF (Local)**: Keyword-based embeddings, works on all systems, fallback option
+
+The system automatically tries these methods in order when the primary method fails.
+
 ## Testing the Complete Functionality
 
 To test the complete RAG chatbot functionality after setup:

@@ -1,5 +1,7 @@
+#!/usr/bin/env python3
 """
-Script to embed book content to Qdrant vector database
+Alternative embedding script using sentence-transformers (open-source)
+This approach uses locally-run embedding models that don't require API keys
 """
 import os
 import glob
@@ -8,8 +10,8 @@ from typing import List, Dict, Any
 import markdown
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
-import google.generativeai as genai
 from dotenv import load_dotenv
+import sys
 
 # Load environment variables
 load_dotenv()
@@ -18,20 +20,14 @@ load_dotenv()
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "")
 QDRANT_COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", "book_vectors")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-GEMINI_EMBEDDING_MODEL = os.getenv("GEMINI_EMBEDDING_MODEL", "models/embedding-001")
 
 def initialize_services():
-    """Initialize Qdrant and Gemini services"""
+    """Initialize Qdrant client"""
     # Initialize Qdrant client
     if QDRANT_API_KEY:
         qdrant_client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
     else:
         qdrant_client = QdrantClient(url=QDRANT_URL)
-
-    # Initialize Gemini
-    if GEMINI_API_KEY:
-        genai.configure(api_key=GEMINI_API_KEY)
 
     return qdrant_client
 
@@ -85,22 +81,21 @@ def extract_text_from_md(file_path: str) -> str:
         print(f"Error reading markdown file {file_path}: {e}")
         return ""
 
-def embed_text(text: str) -> List[float]:
-    """Generate embedding for text using Gemini"""
+def embed_text_with_sentence_transformers(text: str) -> List[float]:
+    """Generate embedding using sentence-transformers (locally run)"""
     try:
-        # Ensure Gemini is configured with API key
-        if GEMINI_API_KEY:
-            genai.configure(api_key=GEMINI_API_KEY)
-        else:
-            print("Error: GEMINI_API_KEY not set in environment variables")
-            return []
-
-        response = genai.embed_content(
-            model=GEMINI_EMBEDDING_MODEL,
-            content=[text],
-            task_type="retrieval_document"
-        )
-        return response['embedding'][0]
+        # Import sentence-transformers on demand to avoid dependency issues
+        from sentence_transformers import SentenceTransformer
+        
+        # Use a pre-trained model that works well for technical content
+        model = SentenceTransformer('all-MiniLM-L6-v2')  # Lightweight model
+        # Alternative: 'all-mpnet-base-v2' for better quality but slower speed
+        
+        embedding = model.encode([text])
+        return embedding[0].tolist()  # Convert numpy array to list
+    except ImportError:
+        print("sentence-transformers not installed. Install with: pip install sentence-transformers")
+        return []
     except Exception as e:
         print(f"Error generating embedding: {e}")
         return []
@@ -112,15 +107,16 @@ def ensure_collection_exists(client: QdrantClient, collection_name: str):
         print(f"Collection {collection_name} already exists")
     except:
         # Create collection
+        # For sentence-transformers 'all-MiniLM-L6-v2', the embedding size is 384
         client.create_collection(
             collection_name=collection_name,
-            vectors_config=models.VectorParams(size=768, distance=models.Distance.COSINE),
+            vectors_config=models.VectorParams(size=384, distance=models.Distance.COSINE),
         )
         print(f"Created collection {collection_name}")
 
 def embed_book_to_qdrant():
-    """Embed all book content to Qdrant"""
-    print("Starting to embed book content to Qdrant...")
+    """Embed all book content to Qdrant using sentence-transformers"""
+    print("Starting to embed book content to Qdrant using sentence-transformers...")
 
     # Initialize services
     qdrant_client = initialize_services()
@@ -155,9 +151,9 @@ def embed_book_to_qdrant():
             if not chunk.strip():
                 continue
 
-            # Generate embedding
+            # Generate embedding using sentence-transformers
             try:
-                embedding = embed_text(chunk)
+                embedding = embed_text_with_sentence_transformers(chunk)
 
                 if not embedding:
                     print(f"Failed to generate embedding for chunk {i} in {file_path}")

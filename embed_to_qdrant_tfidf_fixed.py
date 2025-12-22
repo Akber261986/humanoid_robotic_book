@@ -1,37 +1,33 @@
+#!/usr/bin/env python3
 """
-Script to embed book content to Qdrant vector database
+Direct TF-IDF embedding script to ensure correct collection name
 """
 import os
 import glob
 import uuid
-from typing import List, Dict, Any
+import pickle
+from typing import List
 import markdown
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
-import google.generativeai as genai
 from dotenv import load_dotenv
+from sklearn.feature_extraction.text import TfidfVectorizer
+import numpy as np
 
 # Load environment variables
 load_dotenv()
 
-# Configuration
+# Configuration - explicitly set the TF-IDF collection name
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "")
-QDRANT_COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", "book_vectors")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-GEMINI_EMBEDDING_MODEL = os.getenv("GEMINI_EMBEDDING_MODEL", "models/embedding-001")
+QDRANT_COLLECTION_NAME = "book_vectors_tfidf"  # Explicitly set to TF-IDF collection
 
 def initialize_services():
-    """Initialize Qdrant and Gemini services"""
-    # Initialize Qdrant client
+    """Initialize Qdrant client"""
     if QDRANT_API_KEY:
         qdrant_client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
     else:
         qdrant_client = QdrantClient(url=QDRANT_URL)
-
-    # Initialize Gemini
-    if GEMINI_API_KEY:
-        genai.configure(api_key=GEMINI_API_KEY)
 
     return qdrant_client
 
@@ -85,42 +81,38 @@ def extract_text_from_md(file_path: str) -> str:
         print(f"Error reading markdown file {file_path}: {e}")
         return ""
 
-def embed_text(text: str) -> List[float]:
-    """Generate embedding for text using Gemini"""
+def embed_text_with_tfidf(text: str, vectorizer) -> List[float]:
+    """Generate embedding using TF-IDF vectorizer"""
     try:
-        # Ensure Gemini is configured with API key
-        if GEMINI_API_KEY:
-            genai.configure(api_key=GEMINI_API_KEY)
-        else:
-            print("Error: GEMINI_API_KEY not set in environment variables")
-            return []
-
-        response = genai.embed_content(
-            model=GEMINI_EMBEDDING_MODEL,
-            content=[text],
-            task_type="retrieval_document"
-        )
-        return response['embedding'][0]
+        # Transform the text
+        embedding = vectorizer.transform([text])
+        
+        # Convert sparse matrix to dense and then to list
+        embedding_dense = embedding.toarray()[0]
+        embedding_list = embedding_dense.tolist()
+        
+        return embedding_list
     except Exception as e:
-        print(f"Error generating embedding: {e}")
+        print(f"Error generating TF-IDF embedding: {e}")
         return []
 
 def ensure_collection_exists(client: QdrantClient, collection_name: str):
-    """Ensure the Qdrant collection exists"""
+    """Ensure the Qdrant collection exists with correct dimensions"""
     try:
         client.get_collection(collection_name)
         print(f"Collection {collection_name} already exists")
     except:
-        # Create collection
+        # Create collection with 1000 dimensions for TF-IDF
         client.create_collection(
             collection_name=collection_name,
-            vectors_config=models.VectorParams(size=768, distance=models.Distance.COSINE),
+            vectors_config=models.VectorParams(size=1000, distance=models.Distance.COSINE),
         )
         print(f"Created collection {collection_name}")
 
 def embed_book_to_qdrant():
-    """Embed all book content to Qdrant"""
-    print("Starting to embed book content to Qdrant...")
+    """Embed all book content to Qdrant using TF-IDF"""
+    print("Starting to embed book content to Qdrant using TF-IDF...")
+    print(f"Using collection: {QDRANT_COLLECTION_NAME}")
 
     # Initialize services
     qdrant_client = initialize_services()
@@ -134,10 +126,12 @@ def embed_book_to_qdrant():
 
     print(f"Found {len(markdown_files)} markdown files to process")
 
-    total_chunks = 0
+    # First, collect all texts to fit the vectorizer
+    all_texts = []
+    file_chunks_map = {}  # To keep track of which chunks belong to which files
 
     for file_path in markdown_files:
-        print(f"Processing file: {file_path}")
+        print(f"Preprocessing file: {file_path}")
 
         # Extract text from markdown
         text_content = extract_text_from_md(file_path)
@@ -148,48 +142,79 @@ def embed_book_to_qdrant():
 
         # Split into chunks
         chunks = chunk_text(text_content)
-
-        # Process each chunk
-        points = []
+        
+        # Store chunks for vectorizer fitting and mapping
         for i, chunk in enumerate(chunks):
-            if not chunk.strip():
+            if chunk.strip():
+                all_texts.append(chunk)
+                file_chunks_map[len(all_texts)-1] = (file_path, i)  # Store file and chunk index
+
+    print(f"Collected {len(all_texts)} text chunks for vectorizer fitting")
+
+    if not all_texts:
+        print("No text content to process")
+        return {"status": "failed", "chunks_embedded": 0, "files_processed": 0}
+
+    # Initialize and fit the vectorizer on all texts
+    print("Fitting TF-IDF vectorizer on all content...")
+    vectorizer = TfidfVectorizer(
+        max_features=1000,  # Limit to 1000 features to match collection dimensions
+        stop_words='english',
+        lowercase=True,
+        ngram_range=(1, 2)  # Use both unigrams and bigrams
+    )
+    
+    # Fit the vectorizer on all texts
+    vectorizer.fit(all_texts)
+    print(f"TF-IDF vectorizer fitted with vocabulary size: {len(vectorizer.vocabulary_)}")
+
+    # Now process each chunk and embed it
+    total_chunks = 0
+    for idx, text in enumerate(all_texts):
+        file_path, chunk_idx = file_chunks_map[idx]
+        
+        # Generate embedding using TF-IDF
+        try:
+            embedding = embed_text_with_tfidf(text, vectorizer)
+
+            if not embedding or len(embedding) != 1000:
+                print(f"Failed to generate valid embedding for chunk {chunk_idx} in {file_path}")
                 continue
 
-            # Generate embedding
-            try:
-                embedding = embed_text(chunk)
-
-                if not embedding:
-                    print(f"Failed to generate embedding for chunk {i} in {file_path}")
-                    continue
-
-                # Create Qdrant point
-                point = models.PointStruct(
-                    id=str(uuid.uuid4()),
-                    vector=embedding,
-                    payload={
-                        "text": chunk,
-                        "source": file_path,
-                        "chunk_id": i
-                    }
-                )
-                points.append(point)
-
-            except Exception as e:
-                print(f"Error processing chunk {i} in {file_path}: {e}")
-                continue
-
-        # Upload to Qdrant
-        if points:
+            # Create Qdrant point
+            point = models.PointStruct(
+                id=str(uuid.uuid4()),
+                vector=embedding,
+                payload={
+                    "text": text,
+                    "source": file_path,
+                    "chunk_id": chunk_idx
+                }
+            )
+            
+            # Upload single point to Qdrant
             qdrant_client.upsert(
                 collection_name=QDRANT_COLLECTION_NAME,
-                points=points
+                points=[point]
             )
 
-            total_chunks += len(points)
-            print(f"Embedded {len(points)} chunks from {file_path}")
+            total_chunks += 1
+            
+            if total_chunks % 50 == 0:  # Print progress every 50 chunks
+                print(f"Embedded {total_chunks} chunks so far...")
+
+        except Exception as e:
+            print(f"Error processing chunk {chunk_idx} in {file_path}: {e}")
+            continue
 
     print(f"Successfully embedded {total_chunks} chunks to Qdrant collection '{QDRANT_COLLECTION_NAME}'")
+    
+    # Save the fitted vectorizer for later use in querying
+    vectorizer_path = "./tfidf_vectorizer.pkl"
+    with open(vectorizer_path, 'wb') as f:
+        pickle.dump(vectorizer, f)
+    print(f"Saved fitted vectorizer to {vectorizer_path}")
+    
     return {"status": "completed", "chunks_embedded": total_chunks, "files_processed": len(markdown_files)}
 
 if __name__ == "__main__":

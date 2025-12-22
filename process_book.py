@@ -39,11 +39,33 @@ def embed_to_qdrant():
     result = subprocess.run([sys.executable, "embed_to_qdrant.py"], capture_output=True, text=True)
 
     if result.returncode == 0:
-        print("Successfully embedded book content to Qdrant")
+        print("Successfully embedded book content to Qdrant using Gemini")
         print(result.stdout)
     else:
-        print("Error embedding to Qdrant:")
-        print(result.stderr)
+        print("Error with Gemini embedding, trying transformers-based local embedding...")
+        print("Error details:", result.stderr)
+        # Try transformers-based local embedding as fallback
+        result = subprocess.run([sys.executable, "embed_to_qdrant_transformers.py"], capture_output=True, text=True)
+        if result.returncode == 0:
+            print("Successfully embedded book content to Qdrant using transformers-based local embeddings")
+            print(result.stdout)
+        else:
+            print("Error with transformers-based local embedding, trying sentence-transformers fallback...")
+            # Try sentence-transformers fallback
+            result = subprocess.run([sys.executable, "embed_to_qdrant_local.py"], capture_output=True, text=True)
+            if result.returncode == 0:
+                print("Successfully embedded book content to Qdrant using sentence-transformers")
+                print(result.stdout)
+            else:
+                print("Error with sentence-transformers, trying TF-IDF fallback...")
+                # Try TF-IDF fallback (doesn't require PyTorch)
+                result = subprocess.run([sys.executable, "embed_to_qdrant_tfidf.py"], capture_output=True, text=True)
+                if result.returncode == 0:
+                    print("Successfully embedded book content to Qdrant using TF-IDF")
+                    print(result.stdout)
+                else:
+                    print("Error with all embedding methods:")
+                    print(result.stderr)
 
     return result.returncode == 0
 

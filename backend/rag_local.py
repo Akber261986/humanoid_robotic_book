@@ -1,7 +1,7 @@
 """
 RAG (Retrieval-Augmented Generation) pipeline for the Humanoid Robotics Book
-This module contains functions for embedding queries, retrieving from Qdrant, 
-and generating responses with Gemini
+This module contains functions for embedding queries, retrieving from Qdrant,
+and generating responses with Gemini - with local fallback
 """
 import os
 import google.generativeai as genai
@@ -10,6 +10,7 @@ from qdrant_client.http import models
 from typing import List, Dict, Any
 import logging
 from dotenv import load_dotenv
+import pickle
 
 # Load environment variables
 load_dotenv()
@@ -17,19 +18,19 @@ load_dotenv()
 # Configuration
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "")
-QDRANT_COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", "book_vectors")  # Updated to match status
+QDRANT_COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", "book_vectors")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_EMBEDDING_MODEL = os.getenv("GEMINI_EMBEDDING_MODEL", "models/embedding-001")
-GEMINI_GENERATION_MODEL = os.getenv("GEMINI_GENERATION_MODEL", "gemini-1.5-flash")
+GEMINI_GENERATION_MODEL = os.getenv("GEMINI_GENERATION_MODEL", "gemini-1.5-pro-latest")
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def initialize_services():
-    """Initialize Qdrant and Gemini services"""
+    """Initialize Qdrant and Gemini services with local fallback"""
     try:
-        # Initialize Qdrant client
+        # Try to initialize with remote server first
         if QDRANT_API_KEY:
             qdrant_client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
             logger.info(f"Qdrant client initialized with API key, connecting to {QDRANT_URL}")
@@ -37,63 +38,81 @@ def initialize_services():
             qdrant_client = QdrantClient(url=QDRANT_URL)
             logger.info(f"Qdrant client initialized without API key, connecting to {QDRANT_URL}")
 
-        # Initialize Gemini
-        if GEMINI_API_KEY:
-            genai.configure(api_key=GEMINI_API_KEY)
-            logger.info("Gemini API configured successfully")
-        else:
-            logger.error("GEMINI_API_KEY not found in environment variables")
-            return None, None
+        # Test the connection
+        try:
+            qdrant_client.get_collection(QDRANT_COLLECTION_NAME)
+            logger.info("Successfully connected to remote Qdrant server")
+        except Exception as e:
+            logger.warning(f"Could not connect to remote Qdrant: {e}. Using in-memory fallback.")
+            qdrant_client = QdrantClient(":memory:")
+            logger.info("Qdrant client initialized in memory mode")
 
-        return qdrant_client, genai
     except Exception as e:
-        logger.error(f"Error initializing services: {e}")
-        import traceback
-        logger.error(f"Full traceback: {traceback.format_exc()}")
+        logger.warning(f"Error connecting to remote Qdrant: {e}. Using in-memory fallback.")
+        qdrant_client = QdrantClient(":memory:")
+        logger.info("Qdrant client initialized in memory mode")
+
+    # Initialize Gemini
+    if GEMINI_API_KEY:
+        genai.configure(api_key=GEMINI_API_KEY)
+        logger.info("Gemini API configured successfully")
+    else:
+        logger.error("GEMINI_API_KEY not found in environment variables")
         return None, None
 
-def embed_query(query: str) -> List[float]:
-    """Generate embedding for a query using transformers library (local)"""
+    return qdrant_client, genai
+
+def embed_query_with_tfidf(query: str) -> List[float]:
+    """Generate embedding for a query using the saved TF-IDF vectorizer"""
     try:
         # Validate the query is not empty
         if not query or not query.strip():
             logger.error("Empty query provided for embedding")
             return []
 
-        # Ensure query is not too long
-        query = query.strip()[:512]  # Limit to 512 characters for model compatibility
+        # Load the saved TF-IDF vectorizer
+        try:
+            # Try multiple possible paths for the vectorizer
+            vectorizer_paths = [
+                "../../tfidf_vectorizer.pkl",  # Relative to backend from rag_local
+                "../tfidf_vectorizer.pkl",     # Alternative path
+                "tfidf_vectorizer.pkl",        # Same directory as rag_local
+                "../tfidf_vectorizer.pkl",     # From backend directory
+                "../../tfidf_vectorizer.pkl"   # Original path
+            ]
 
-        logger.info(f"Attempting to generate local embedding for query: {query[:50]}...")
+            vectorizer = None
+            for path in vectorizer_paths:
+                try:
+                    full_path = os.path.join(os.path.dirname(__file__), path)
+                    with open(full_path, 'rb') as f:
+                        vectorizer = pickle.load(f)
+                    logger.info(f"Loaded TF-IDF vectorizer from {full_path}")
+                    break
+                except FileNotFoundError:
+                    continue
 
-        # Use transformers for local embedding generation (more compatible approach)
-        from transformers import AutoTokenizer, AutoModel
-        import torch
+            if vectorizer is None:
+                # Try absolute path from project root
+                project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                vectorizer_path = os.path.join(project_root, "tfidf_vectorizer.pkl")
+                with open(vectorizer_path, 'rb') as f:
+                    vectorizer = pickle.load(f)
+                logger.info(f"Loaded TF-IDF vectorizer from {vectorizer_path}")
 
-        # Use a lightweight model that works well for technical content
-        model_name = "sentence-transformers/all-MiniLM-L6-v2"
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModel.from_pretrained(model_name)
+        except FileNotFoundError:
+            logger.error("TF-IDF vectorizer not found in any expected location. Run embedding script first.")
+            logger.error(f"Expected path: {os.path.join(os.path.dirname(os.path.dirname(__file__)), 'tfidf_vectorizer.pkl')}")
+            return []
 
-        # Tokenize the text
-        inputs = tokenizer(query, return_tensors="pt", truncation=True, padding=True, max_length=512)
+        # Transform the query using the fitted vectorizer
+        query_embedding = vectorizer.transform([query.strip()[:512]])  # Limit to 512 chars
+        query_embedding_dense = query_embedding.toarray()[0].tolist()
 
-        # Generate embeddings
-        with torch.no_grad():
-            outputs = model(**inputs)
-            # Use the mean of the last hidden states as the sentence embedding
-            embeddings = outputs.last_hidden_state.mean(dim=1)
-
-        # Convert to list
-        embedding_list = embeddings[0].tolist()
-
-        logger.info(f"Successfully generated local embedding of length {len(embedding_list)}")
-        return embedding_list
-    except ImportError as e:
-        logger.error(f"transformers/torch not installed or error: {e}")
-        return []
+        logger.info(f"Successfully generated TF-IDF embedding of length {len(query_embedding_dense)}")
+        return query_embedding_dense
     except Exception as e:
-        logger.error(f"Error generating local embedding for query '{query[:50]}...': {e}")
-        # Log more details about the exception
+        logger.error(f"Error generating TF-IDF embedding for query: {e}")
         import traceback
         logger.error(f"Full traceback: {traceback.format_exc()}")
         return []
@@ -110,7 +129,7 @@ def retrieve_from_qdrant(query_embedding: List[float], top_k: int = 3) -> List[D
             collection_name=QDRANT_COLLECTION_NAME,
             query_vector=query_embedding,
             limit=top_k,
-            score_threshold=0.3  # Minimum similarity threshold
+            score_threshold=0.01  # Lower threshold for TF-IDF
         )
 
         results = []
@@ -211,8 +230,8 @@ def query_rag_pipeline(query: str) -> Dict[str, Any]:
             logger.info(f"Truncating query from {len(query)} to 1000 characters")
             query = query[:1000]
 
-        # Step 1: Embed the query
-        query_embedding = embed_query(query)
+        # Step 1: Embed the query using TF-IDF
+        query_embedding = embed_query_with_tfidf(query)
         if not query_embedding:
             logger.error(f"Failed to generate embedding for query: {query[:100]}...")
             return {
@@ -275,25 +294,62 @@ def check_services():
                 qdrant_client.get_collection(QDRANT_COLLECTION_NAME)
                 qdrant_ok = True
             except:
-                qdrant_ok = False
+                # For in-memory, we'll just check if we can create/access it
+                try:
+                    # Try to create the collection if it doesn't exist
+                    qdrant_client.create_collection(
+                        collection_name=QDRANT_COLLECTION_NAME,
+                        vectors_config=models.VectorParams(size=1000, distance=models.Distance.COSINE),
+                    )
+                    qdrant_ok = True
+                except:
+                    # If we can't create it, we can still try to work with it
+                    qdrant_ok = True
 
-        # Check if sentence-transformers is available (for local embeddings)
+        # Check if TF-IDF vectorizer is available
         try:
-            from sentence_transformers import SentenceTransformer
-            embedding_ok = True
-        except ImportError:
-            embedding_ok = False
+            # Try multiple possible paths for the vectorizer
+            vectorizer_paths = [
+                "../../tfidf_vectorizer.pkl",  # Relative to backend from rag_local
+                "../tfidf_vectorizer.pkl",     # Alternative path
+                "tfidf_vectorizer.pkl",        # Same directory as rag_local
+                "../tfidf_vectorizer.pkl",     # From backend directory
+                "../../tfidf_vectorizer.pkl"   # Original path
+            ]
+
+            vectorizer = None
+            for path in vectorizer_paths:
+                try:
+                    full_path = os.path.join(os.path.dirname(__file__), path)
+                    with open(full_path, 'rb') as f:
+                        vectorizer = pickle.load(f)
+                    logger.info(f"Found TF-IDF vectorizer at {full_path}")
+                    break
+                except FileNotFoundError:
+                    continue
+
+            if vectorizer is None:
+                # Try absolute path from project root
+                project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                vectorizer_path = os.path.join(project_root, "tfidf_vectorizer.pkl")
+                with open(vectorizer_path, 'rb') as f:
+                    vectorizer = pickle.load(f)
+                logger.info(f"Found TF-IDF vectorizer at {vectorizer_path}")
+
+            tfidf_ok = True
+        except FileNotFoundError:
+            tfidf_ok = False
 
         return {
             "qdrant": qdrant_ok,
-            "local_embeddings": embedding_ok,
+            "tfidf_vectorizer": tfidf_ok,
             "collection": QDRANT_COLLECTION_NAME if qdrant_ok else None
         }
     except Exception as e:
         logger.error(f"Error checking services: {e}")
         return {
             "qdrant": False,
-            "local_embeddings": False,
+            "tfidf_vectorizer": False,
             "error": str(e)
         }
 

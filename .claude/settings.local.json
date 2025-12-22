@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python test_api_endpoints.py)",
+      "Bash(python debug_env.py)"
+    ]
+  }
+}
