@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(python test_api_endpoints.py)",
-      "Bash(python debug_env.py)"
+      "Bash(python debug_env.py)",
+      "Bash(ls -la *.py)",
+      "Bash(find . -name \"*.py\" -exec grep -l \"FastAPI\\\\|uvicorn\" {} ;)",
+      "Bash(rm -f debug_env.py debug_rag_simple.py embedding_status.py index_book_content.py run_app_and_embed.py run_embedding.py run_embedding_fixed.py test_api_endpoints.py test_api_key.py test_api_key_direct.py test_direct_rag.py test_embedding.py test_final.py test_new_api.py test_new_api2.py test_new_api3.py test_query_functionality.py test_rag_chatbot.py test_rag_functionality.py test_rag_local.py test_sentence_transformers.py test_tfidf_rag.py)",
+      "Bash(dir \"%USERPROFILE%\\\\.config\\\\gcloud\")"
     ]
   }
 }

@@ -78,6 +78,10 @@ local/
 *.local
 config/
 
+# Claude Code specific
+.claude.json
+.claude/
+
 # Temporary files
 *.tmp
 *.temp
