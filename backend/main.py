@@ -13,8 +13,8 @@ import os
 # Add the backend directory to Python path to ensure rag module can be imported
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-# Use the simple rag module that works with TF-IDF
-from rag_simple import query_rag_pipeline, check_services
+# Use the fixed rag module that bypasses TF-IDF issues
+from rag_simple_fixed import query_rag_pipeline, check_services
 
 app = FastAPI(title="Humanoid Robotics Book API", version="1.0.0")
 
