@@ -13,9 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY backend/main.py .
-COPY backend/rag_simple.py .
+COPY backend/rag_simple_fixed.py .
 COPY frontend_chat.html .
-COPY tfidf_vectorizer.pkl .
 
 # Copy the docs directory
 COPY docs/ ./docs/
