@@ -19,165 +19,16 @@ load_dotenv()
 # Configuration - only use generation model, embedding will be TF-IDF
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_GENERATION_MODEL = os.getenv("GEMINI_GENERATION_MODEL", "gemini-2.5-flash")  # Updated default
-QDRANT_COLLECTION_NAME = "book_vectors"
+QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "")
+QDRANT_COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", "book_vectors")
 
-# Global variable to store the Qdrant client
-qdrant_client_global = None
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 100) -> List[str]:
-    """Split text into overlapping chunks"""
-    sentences = text.split('. ')
-    chunks = []
-    current_chunk = ""
-
-    for sentence in sentences:
-        sentence = sentence.strip()
-        if not sentence:
-            continue
-
-        if len(current_chunk + sentence) < chunk_size:
-            current_chunk += sentence + ". "
-        else:
-            if current_chunk:
-                chunks.append(current_chunk.strip())
-
-            # Create overlapping chunk
-            words = current_chunk.split()
-            overlap_start = max(0, len(words) - overlap)
-            current_chunk = " ".join(words[overlap_start:]) + " " + sentence + ". "
-
-    if current_chunk.strip():
-        chunks.append(current_chunk.strip())
-
-    return chunks
-
-
-def extract_text_from_md(file_path: str) -> str:
-    """Extract text content from a markdown file"""
-    try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            content = file.read()
-
-        # Convert markdown to plain text
-        html = markdown.markdown(content)
-        # Simple approach to extract text from HTML
-        text = html.replace('<p>', ' ').replace('</p>', ' ').replace('<h1>', ' ').replace('</h1>', ' ') \
-                  .replace('<h2>', ' ').replace('</h2>', ' ').replace('<h3>', ' ').replace('</h3>', ' ') \
-                  .replace('<li>', ' ').replace('</li>', ' ').replace('<ul>', ' ').replace('</ul>', ' ') \
-                  .replace('<strong>', ' ').replace('</strong>', ' ').replace('<em>', ' ').replace('</em>', ' ')
-
-        # Remove extra whitespace
-        import re
-        text = re.sub(r'\s+', ' ', text).strip()
-
-        return text
-    except Exception as e:
-        logger.error(f"Error reading markdown file {file_path}: {e}")
-        return ""
-
-
-def load_book_content_to_qdrant(qdrant_client: QdrantClient):
-    """Load book content from docs directory into Qdrant"""
-    global vectorizer
-    try:
-        # Ensure the collection exists
-        try:
-            qdrant_client.get_collection(QDRANT_COLLECTION_NAME)
-            logger.info(f"Collection {QDRANT_COLLECTION_NAME} already exists")
-        except:
-            # Create collection - we'll use 1000 dimensions to match our TF-IDF vectorizer
-            qdrant_client.create_collection(
-                collection_name=QDRANT_COLLECTION_NAME,
-                vectors_config=models.VectorParams(size=1000, distance=models.Distance.COSINE),
-            )
-            logger.info(f"Created collection {QDRANT_COLLECTION_NAME}")
-
-        # Find all markdown files in docs directory
-        docs_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "docs")
-        if not os.path.exists(docs_path):
-            logger.error(f"Docs directory does not exist: {docs_path}")
-            return
-
-        markdown_files = glob.glob(f"{docs_path}/**/*.md", recursive=True)
-        logger.info(f"Found {len(markdown_files)} markdown files to process")
-
-        if not markdown_files:
-            logger.warning("No markdown files found in docs directory")
-            return
-
-        # Load the TF-IDF vectorizer that was saved during embedding
-        try:
-            # Try absolute path from project root
-            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            vectorizer_path = os.path.join(project_root, "tfidf_vectorizer.pkl")
-            with open(vectorizer_path, 'rb') as f:
-                vectorizer = pickle.load(f)
-            logger.info(f"Loaded TF-IDF vectorizer from {vectorizer_path}")
-        except FileNotFoundError:
-            logger.error("TF-IDF vectorizer not found. Run embedding script first.")
-            return
-
-        total_chunks = 0
-        # Process each markdown file
-        for file_path in markdown_files:
-            logger.info(f"Processing file: {file_path}")
-
-            # Extract text from markdown
-            text_content = extract_text_from_md(file_path)
-
-            if not text_content.strip():
-                logger.warning(f"No content extracted from {file_path}")
-                continue
-
-            # Split into chunks
-            chunks = chunk_text(text_content)
-
-            # Process each chunk
-            for i, chunk in enumerate(chunks):
-                if not chunk.strip():
-                    continue
-
-                # Generate embedding using the loaded TF-IDF vectorizer
-                try:
-                    chunk_embedding = vectorizer.transform([chunk]).toarray()[0].tolist()
-
-                    # Create Qdrant point
-                    point = models.PointStruct(
-                        id=str(uuid.uuid4()),
-                        vector=chunk_embedding,
-                        payload={
-                            "text": chunk,
-                            "source": os.path.relpath(file_path, os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-                            "chunk_id": i
-                        }
-                    )
-
-                    # Upload single point to Qdrant
-                    qdrant_client.upsert(
-                        collection_name=QDRANT_COLLECTION_NAME,
-                        points=[point]
-                    )
-
-                    total_chunks += 1
-
-                    if total_chunks % 50 == 0:  # Print progress every 50 chunks
-                        logger.info(f"Loaded {total_chunks} chunks so far...")
-
-                except Exception as e:
-                    logger.error(f"Error processing chunk {i} in {file_path}: {e}")
-                    continue
-
-        logger.info(f"Successfully loaded {total_chunks} chunks to Qdrant collection '{QDRANT_COLLECTION_NAME}'")
-
-    except Exception as e:
-        logger.error(f"Error loading book content to Qdrant: {e}")
-        import traceback
-        logger.error(f"Full traceback: {traceback.format_exc()}")
 
 def initialize_services():
     """Initialize Qdrant in memory mode and Gemini"""
@@ -244,17 +95,16 @@ def embed_query_with_tfidf(query: str) -> List[float]:
         return []
 
 def retrieve_from_qdrant(query_embedding: List[float], top_k: int = 3) -> List[Dict[str, Any]]:
-    """Retrieve top-k similar documents from Qdrant"""
-    global qdrant_client_global
+    """Retrieve top-k similar documents from Qdrant cloud instance"""
     try:
-        if qdrant_client_global is None:
-            # Initialize client if not already done
-            qdrant_client_global = QdrantClient(":memory:")
-            # Load book content if not already loaded
-            load_book_content_to_qdrant(qdrant_client_global)
+        # Initialize Qdrant client with cloud settings
+        if QDRANT_API_KEY:
+            qdrant_client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
+        else:
+            qdrant_client = QdrantClient(url=QDRANT_URL)
 
-        # Perform search using cosine similarity
-        search_results = qdrant_client_global.search(
+        # Perform search using cosine similarity against cloud collection
+        search_results = qdrant_client.search(
             collection_name=QDRANT_COLLECTION_NAME,
             query_vector=query_embedding,
             limit=top_k,
@@ -270,10 +120,10 @@ def retrieve_from_qdrant(query_embedding: List[float], top_k: int = 3) -> List[D
                 "score": result.score
             })
 
-        logger.info(f"Retrieved {len(results)} documents from Qdrant with scores: {[r['score'] for r in results]}")
+        logger.info(f"Retrieved {len(results)} documents from Qdrant cloud with scores: {[r['score'] for r in results]}")
         return results
     except Exception as e:
-        logger.error(f"Error retrieving from Qdrant: {e}")
+        logger.error(f"Error retrieving from Qdrant cloud: {e}")
         import traceback
         logger.error(f"Full traceback: {traceback.format_exc()}")
         return []
