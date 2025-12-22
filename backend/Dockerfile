@@ -16,7 +16,6 @@ COPY backend/main.py .
 COPY backend/rag_simple.py .
 COPY frontend_chat.html .
 COPY tfidf_vectorizer.pkl .
-COPY .env .
 
 # Copy the docs directory
 COPY docs/ ./docs/
