@@ -54,38 +54,38 @@ def embed_query_with_tfidf(query: str) -> List[float]:
             logger.error("Empty query provided for embedding")
             return []
 
-        # Load the saved TF-IDF vectorizer
+        # Load the saved TF-IDF vectorizer or create a compatible one
+        vectorizer = None
         try:
-            # Try multiple possible locations for the vectorizer file
+            # Try multiple possible locations for the pre-trained vectorizer file
             possible_paths = [
                 "tfidf_vectorizer.pkl",  # Same directory as script (for Docker deployment)
                 os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tfidf_vectorizer.pkl"),  # Project root
                 os.path.join(os.path.dirname(__file__), "tfidf_vectorizer.pkl"),  # Same directory as script (alternative)
             ]
 
-            vectorizer = None
             vectorizer_path = None
 
             for path in possible_paths:
                 if os.path.exists(path):
                     try:
                         with open(path, 'rb') as f:
-                            # Try to load the vectorizer with error handling for compatibility issues
                             import pickle
-                            import sys
-                            # Set pickle protocol to handle compatibility issues
                             vectorizer = pickle.load(f)
                         vectorizer_path = path
+                        logger.info(f"Loaded pre-trained TF-IDF vectorizer from {vectorizer_path}")
                         break
                     except Exception as load_error:
                         logger.warning(f"Failed to load vectorizer from {path}: {load_error}")
                         continue
 
+            # If we couldn't load the pre-trained vectorizer, we have a problem
+            # since the Qdrant vectors were created with a specific vectorizer
             if vectorizer is None:
                 logger.error("TF-IDF vectorizer not found or could not be loaded from any expected location.")
+                logger.error("This will cause issues since Qdrant vectors were created with a specific vectorizer.")
                 return []
 
-            logger.info(f"Loaded TF-IDF vectorizer from {vectorizer_path}")
         except Exception as e:
             logger.error(f"Error loading TF-IDF vectorizer: {e}")
             import traceback
